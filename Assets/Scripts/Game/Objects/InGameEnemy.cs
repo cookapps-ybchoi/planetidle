@@ -2,19 +2,46 @@ using UnityEngine;
 
 public class InGameEnemy : MonoBehaviour, InGameObject
 {
-    private float _moveSpeed = 1f;
-    private bool _isMoving = false;
+    private enum EnemyState
+    {
+        Idle,
+        Moving,
+        Attacking
+    }
+
+    private EnemyState _currentState = EnemyState.Idle;
+    private EnemyData _enemyData;
+
     public void Initialize()
     {
         LookAtPlanet();
-        _isMoving = true;
+        _currentState = EnemyState.Moving;
     }
+
+    public void SetData(EnemyData enemyData)
+    {
+        _enemyData = enemyData;
+    }   
 
     private void Update()
     {
-        if (_isMoving)
+        switch (_currentState)
         {
-            MoveToPlanet();
+            case EnemyState.Moving:
+                if (Vector3.Distance(transform.position, InGameManager.Instance.GetPlanetTransform().position) <= _enemyData.AttackRange)
+                {
+                    Debug.Log("행성에 도달했습니다.");
+                    _currentState = EnemyState.Attacking;
+                }
+                else
+                {
+                    MoveToPlanet();
+                }
+                break;
+
+            case EnemyState.Attacking:
+                AttackPlanet();
+                break;
         }
     }
 
@@ -28,15 +55,12 @@ public class InGameEnemy : MonoBehaviour, InGameObject
 
     private void MoveToPlanet()
     {
-        transform.position = Vector3.MoveTowards(transform.position, InGameManager.Instance.GetPlanetTransform().position, _moveSpeed * Time.deltaTime);
-    }
-    
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Planet"))
-        {
-            Debug.Log("행성에 도달했습니다.");
-        }
+        transform.position = Vector3.MoveTowards(transform.position, InGameManager.Instance.GetPlanetTransform().position, _enemyData.MoveSpeed * Time.deltaTime);
     }
 
+    private void AttackPlanet()
+    {
+        // 행성에 공격
+        // InGameManager.Instance.GetPlanetTransform().GetComponent<InGamePlanet>().TakeDamage(_enemyData.AttackPower);
+    }
 }

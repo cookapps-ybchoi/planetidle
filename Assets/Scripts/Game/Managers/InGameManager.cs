@@ -19,7 +19,7 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         await WaitForInstance(DataManager.Instance);
 
         // 데이터 초기화
-        DataManager.Instance.Init();
+        DataManager.Instance.Initialize();
 
         // AddressableManager 인스턴스 대기
         await WaitForInstance(AddressableManager.Instance);
@@ -33,19 +33,19 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         }
 
         // 적 생성 매니저 인스턴스 대기
-        await WaitForInstance(EnemySpawnManager.Instance);
+        await WaitForInstance(InGameWaveManager.Instance);
 
         // 적 생성 매니저 초기화
-        EnemySpawnManager.Instance.Initialize();
+        InGameWaveManager.Instance.Initialize();
 
 
         // 레벨 시작
-        StartLevel(1);
+        StartGame();
     }
 
-    public void StartLevel(int level = 1)
+    public void StartGame()
     {
-        EnemySpawnManager.Instance.StartLevelSpawn(level);
+        InGameWaveManager.Instance.StartWave();
     }
 
     private async Task WaitForInstance<T>(T instance) where T : class

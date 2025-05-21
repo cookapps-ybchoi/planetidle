@@ -8,5 +8,5 @@ public class Constants
     public const float RANGE_PER_LEVEL = 0.1f;
     public const float HP_PER_LEVEL = 5f;
     public const float HP_RECOVERY_PER_LEVEL = 0.2f;
-    public const float ENEMY_SPAWN_DISTANCE = 8f;
+    public const float ENEMY_SPAWN_DISTANCE = 7f;
 }

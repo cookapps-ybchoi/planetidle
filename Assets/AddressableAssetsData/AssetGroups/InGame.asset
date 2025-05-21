@@ -21,6 +21,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - InGame
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6fa6aff94b8b7694899fa5b2f1593920
+    m_Address: InGame/Enemy_002
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InGame
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7461e981a08fcfd45b47f1bd5c4980b6
+    m_Address: InGame/Enemy_003
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InGame
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b8b26085bc4076544ab9171c255b4f04
     m_Address: InGame/Planet_001
     m_ReadOnly: 0

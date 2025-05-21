@@ -1,16 +1,23 @@
 using UnityEngine;
 using System.IO;
+using System.Collections.Generic;
 
 public class DataManager : GameObjectSingleton<DataManager>
 {
     private PlanetData _planetData;
+    private List<EnemyData> _enemyDatas;
+    private List<WaveData> _waveDatas;
     private string _planetSavePath => Path.Combine(Application.persistentDataPath, "planetData.json");
 
     public PlanetData PlanetData => _planetData;
+    public List<EnemyData> EnemyDataList => _enemyDatas;
+    public List<WaveData> WaveDataList => _waveDatas;
 
-    public void Init()
+    public void Initialize()
     {
         _planetData = LoadPlanetData();
+        _enemyDatas = LoadEnemyDatas();
+        _waveDatas = LoadWaveDatas();
     }
 
     public void Save()
@@ -64,6 +71,33 @@ public class DataManager : GameObjectSingleton<DataManager>
             Debug.LogError($"데이터 로드 중 오류 발생: {e.Message}");
             return CreatePlanetData();
         }
+    }
+
+    private List<EnemyData> LoadEnemyDatas()
+    {
+        List<EnemyData> enemyDatas = new List<EnemyData>();
+        // 적 데이터 생성 (임시)
+        enemyDatas.Add(new EnemyData(1, 1, 50, 0.5f, 0.3f, 1f, 2f));    // 기본
+        enemyDatas.Add(new EnemyData(2, 1, 50, 1.5f, 0.3f, 1f, 2f));      // 빠른 속도
+        enemyDatas.Add(new EnemyData(3, 1, 100, 0.5f, 0.3f, 1f, 2f));   // 높은 HP
+        return enemyDatas;
+    }
+
+    private List<WaveData> LoadWaveDatas()
+    {
+        List<WaveData> waveDatas = new List<WaveData>();
+        // 웨이브 데이터 생성 (임시)
+        waveDatas.Add(new WaveData(1, 1, 20, 1.5f, new float[] { 0.8f, 0.2f, 0.0f }));
+        waveDatas.Add(new WaveData(2, 2, 20, 1.5f, new float[] { 0.7f, 0.2f, 0.1f }));
+        waveDatas.Add(new WaveData(3, 3, 20, 1.5f, new float[] { 0.65f, 0.2f, 0.15f }));
+        waveDatas.Add(new WaveData(4, 4, 20, 1.5f, new float[] { 0.6f, 0.25f, 0.15f }));
+        waveDatas.Add(new WaveData(5, 5, 20, 1.5f, new float[] { 0.55f, 0.25f, 0.2f }));
+        waveDatas.Add(new WaveData(6, 6, 20, 1.5f, new float[] { 0.5f, 0.3f, 0.2f }));
+        waveDatas.Add(new WaveData(7, 7, 20, 1.5f, new float[] { 0.45f, 0.35f, 0.2f }));
+        waveDatas.Add(new WaveData(8, 8, 20, 1.5f, new float[] { 0.4f, 0.35f, 0.25f }));
+        waveDatas.Add(new WaveData(9, 9, 20, 1.5f, new float[] { 0.35f, 0.40f, 0.25f }));
+        waveDatas.Add(new WaveData(10, 10, 20, 1.5f, new float[] { 0.3f, 0.45f, 0.2f }));
+        return waveDatas;
     }
 
     public void DeleteSaveData()
