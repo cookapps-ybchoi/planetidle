@@ -10,7 +10,7 @@ public enum PlanetStatType
 
 public class PlanetData
 {
-    public int PlanetId { get; }
+    public int PlanetId { get; private set; }
     public int PlanetLevel { get; private set; }
     public int AttackPowerLevel { get; private set; }
     public int AttackSpeedLevel { get; private set; }
@@ -18,7 +18,7 @@ public class PlanetData
     public int HpLevel { get; private set; }
     public int HpRecoveryLevel { get; private set; }
 
-    public PlanetData(int planetId = 0, int planetLevel = 0, int attackPowerLevel = 0,
+    public PlanetData(int planetId = 1, int planetLevel = 0, int attackPowerLevel = 0,
         int attackSpeedLevel = 0, int rangeLevel = 0, int hpLevel = 0, int hpRecoveryLevel = 0)
     {
         PlanetId = planetId;
@@ -32,6 +32,7 @@ public class PlanetData
 
     public void SetData(PlanetData data)
     {
+        PlanetId = data.PlanetId;
         PlanetLevel = data.PlanetLevel;
         AttackPowerLevel = data.AttackPowerLevel;
         AttackSpeedLevel = data.AttackSpeedLevel;
@@ -63,6 +64,11 @@ public class PlanetData
                 HpRecoveryLevel++;
                 break;
         }
+    }
+
+    public void SetPlanetId(int planetId)
+    {
+        PlanetId = planetId;
     }
 
     public float GetStatValue(PlanetStatType statType)
@@ -106,7 +112,7 @@ public class PlanetData
     {
         return statType switch
         {
-            PlanetStatType.Range => Constants.RANGE_DEFAULT,
+            PlanetStatType.Range => Constants.DEFAULT_RANGE,
             _ => 0f
         };
     }

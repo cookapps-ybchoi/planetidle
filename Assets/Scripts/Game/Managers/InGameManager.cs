@@ -6,9 +6,12 @@ using Unity.VisualScripting;
 
 public class InGameManager : GameObjectSingleton<InGameManager>
 {
-    [SerializeField] private PrefabAddressConfig prefabConfig;
-
     private InGamePlanet _planet;
+
+    public Transform GetPlanetTransform()
+    {
+        return _planet.transform;
+    }
 
     private async void Start()
     {
@@ -22,13 +25,27 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         await WaitForInstance(AddressableManager.Instance);
 
         // 행성 프리팹 인스턴스화
-        _planet = await AddressableManager.Instance.InstantiateAsync<InGamePlanet>(
-            prefabConfig.InGamePlanet, Vector3.zero, transform);
+        _planet = await AddressableManager.Instance.GetPlanet(DataManager.Instance.PlanetData.PlanetId, Vector3.zero, transform);
 
         if (_planet != null)
         {
             _planet.Initialize();
         }
+
+        // 적 생성 매니저 인스턴스 대기
+        await WaitForInstance(EnemySpawnManager.Instance);
+
+        // 적 생성 매니저 초기화
+        EnemySpawnManager.Instance.Initialize();
+
+
+        // 레벨 시작
+        StartLevel(1);
+    }
+
+    public void StartLevel(int level = 1)
+    {
+        EnemySpawnManager.Instance.StartLevelSpawn(level);
     }
 
     private async Task WaitForInstance<T>(T instance) where T : class

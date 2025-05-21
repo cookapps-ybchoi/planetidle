@@ -15,8 +15,14 @@ MonoBehaviour:
   m_GroupName: InGame
   m_GUID: 59adfab6f2276de41842126bc421dc28
   m_SerializeEntries:
+  - m_GUID: 435a5cd91d6a7c34583a7f2cdd521bc7
+    m_Address: InGame/Enemy_001
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InGame
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b8b26085bc4076544ab9171c255b4f04
-    m_Address: InGame/Planet
+    m_Address: InGame/Planet_001
     m_ReadOnly: 0
     m_SerializedLabels:
     - InGame

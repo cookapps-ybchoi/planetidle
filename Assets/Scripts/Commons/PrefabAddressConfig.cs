@@ -4,4 +4,5 @@ using UnityEngine;
 public class PrefabAddressConfig : ScriptableObject
 {
     public string InGamePlanet = "InGame/Planet";
+    public string InGameEnemy  = "InGame/Enemy";
 }
