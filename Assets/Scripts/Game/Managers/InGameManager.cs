@@ -2,21 +2,38 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 
-public class InGameManager : MonoBehaviour
+public class InGameManager : GameObjectSingleton<InGameManager>
 {
     [SerializeField] private PrefabAddressConfig prefabConfig;
 
+    private InGamePlanet _planet;
+
     private async void Start()
     {
-        // GoblinEnemy.cs 컴포넌트가 붙은 프리팹이라고 가정
-        InGamePlanet planet = await AddressableManager.Instance.InstantiateAsync<InGamePlanet>(
+        // DataManager 인스턴스 대기
+        await WaitForInstance(DataManager.Instance);
+
+        // 데이터 초기화
+        DataManager.Instance.Init();
+
+        // AddressableManager 인스턴스 대기
+        await WaitForInstance(AddressableManager.Instance);
+
+        // 행성 프리팹 인스턴스화
+        _planet = await AddressableManager.Instance.InstantiateAsync<InGamePlanet>(
             prefabConfig.InGamePlanet, Vector3.zero, transform);
 
-        if (planet != null)
+        if (_planet != null)
         {
-            planet.Initialize(); // 원하는 초기화 로직 실행
+            _planet.Initialize();
         }
+    }
+
+    private async Task WaitForInstance<T>(T instance) where T : class
+    {
+        while (instance == null) await Task.Yield();
     }
 }
 

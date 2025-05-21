@@ -8,7 +8,7 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
     /// <summary>
     /// 주소로부터 오브젝트를 생성하고 T 컴포넌트를 반환
     /// </summary>
-    public async Task<T> InstantiateAsync<T>(string address, Vector3 position, Transform parent = null) where T : Component
+    public async Task<T> InstantiateAsync<T>(string address, Vector3 position = default, Transform parent = null) where T : Component
     {
         AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>(address);
         await handle.Task;

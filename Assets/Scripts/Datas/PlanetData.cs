@@ -1,0 +1,113 @@
+public enum PlanetStatType
+{
+    Level,
+    AttackPower,
+    AttackSpeed,
+    Range,
+    Hp,
+    HpRecovery
+}
+
+public class PlanetData
+{
+    public int PlanetId { get; }
+    public int PlanetLevel { get; private set; }
+    public int AttackPowerLevel { get; private set; }
+    public int AttackSpeedLevel { get; private set; }
+    public int RangeLevel { get; private set; }
+    public int HpLevel { get; private set; }
+    public int HpRecoveryLevel { get; private set; }
+
+    public PlanetData(int planetId = 0, int planetLevel = 0, int attackPowerLevel = 0,
+        int attackSpeedLevel = 0, int rangeLevel = 0, int hpLevel = 0, int hpRecoveryLevel = 0)
+    {
+        PlanetId = planetId;
+        PlanetLevel = planetLevel;
+        AttackPowerLevel = attackPowerLevel;
+        AttackSpeedLevel = attackSpeedLevel;
+        RangeLevel = rangeLevel;
+        HpLevel = hpLevel;
+        HpRecoveryLevel = hpRecoveryLevel;
+    }
+
+    public void SetData(PlanetData data)
+    {
+        PlanetLevel = data.PlanetLevel;
+        AttackPowerLevel = data.AttackPowerLevel;
+        AttackSpeedLevel = data.AttackSpeedLevel;
+        RangeLevel = data.RangeLevel;
+        HpLevel = data.HpLevel;
+        HpRecoveryLevel = data.HpRecoveryLevel;
+    }
+
+    public void IncreaseLevel(PlanetStatType statType)
+    {
+        switch (statType)
+        {
+            case PlanetStatType.Level:
+                PlanetLevel++;
+                break;
+            case PlanetStatType.AttackPower:
+                AttackPowerLevel++;
+                break;
+            case PlanetStatType.AttackSpeed:
+                AttackSpeedLevel++;
+                break;
+            case PlanetStatType.Range:
+                RangeLevel++;
+                break;
+            case PlanetStatType.Hp:
+                HpLevel++;
+                break;
+            case PlanetStatType.HpRecovery:
+                HpRecoveryLevel++;
+                break;
+        }
+    }
+
+    public float GetStatValue(PlanetStatType statType)
+    {
+        return GetStatDefault(statType) + GetStatLevel(statType) * GetStatMultiplier(statType);
+    }
+
+    public float GetNextLevelStatValue(PlanetStatType statType)
+    {
+        return GetStatDefault(statType) + (GetStatLevel(statType) + 1) * GetStatMultiplier(statType);
+    }
+
+    private int GetStatLevel(PlanetStatType statType)
+    {
+        return statType switch
+        {
+            PlanetStatType.Level => PlanetLevel,
+            PlanetStatType.AttackPower => AttackPowerLevel,
+            PlanetStatType.AttackSpeed => AttackSpeedLevel,
+            PlanetStatType.Range => RangeLevel,
+            PlanetStatType.Hp => HpLevel,
+            PlanetStatType.HpRecovery => HpRecoveryLevel,
+            _ => 0
+        };
+    }
+
+    private float GetStatMultiplier(PlanetStatType statType)
+    {
+        return statType switch
+        {
+            PlanetStatType.AttackPower => Constants.ATTACK_POWER_PER_LEVEL,
+            PlanetStatType.AttackSpeed => Constants.ATTACK_SPEED_PER_LEVEL,
+            PlanetStatType.Range => Constants.RANGE_PER_LEVEL,
+            PlanetStatType.Hp => Constants.HP_PER_LEVEL,
+            PlanetStatType.HpRecovery => Constants.HP_RECOVERY_PER_LEVEL,
+            _ => 1f
+        };
+    }
+
+    private float GetStatDefault(PlanetStatType statType)
+    {
+        return statType switch
+        {
+            PlanetStatType.Range => Constants.RANGE_DEFAULT,
+            _ => 0f
+        };
+    }
+}
