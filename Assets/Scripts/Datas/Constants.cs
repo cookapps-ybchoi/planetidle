@@ -24,5 +24,5 @@ public class Constants
 
     public const float ENEMY_SPAWN_DISTANCE = 4f;
 
-    public const float WAVE_INTERVAL = 1f;
+    public const float WAVE_INTERVAL = 2f;
 }

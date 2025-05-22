@@ -10,10 +10,6 @@ public class DistanceGizmo2D : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // 중심점 표시
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(transform.position, 0.1f);
-
         // 0.5 단위로 원 그리기
         for (int i = 1; i <= maxDistance; i++)
         {
@@ -25,6 +21,7 @@ public class DistanceGizmo2D : MonoBehaviour
     private void DrawCircle2D(Vector3 center, float radius, Color color)
     {
         Gizmos.color = color;
+        int segments = 32;
         
         Vector3 previousPoint = center + new Vector3(radius, 0f, 0f);
         

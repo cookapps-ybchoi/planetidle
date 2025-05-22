@@ -1,5 +1,6 @@
 using UnityEngine;
 using Game.ObjectPool;
+using System;
 
 public class InGameEnemy : PoolableObject
 {
@@ -12,8 +13,16 @@ public class InGameEnemy : PoolableObject
         Finish,
     }
 
+    public float EnemySize => _size;
+    public event Action<InGameEnemy> OnEnemyDestroyed;
+
+    [SerializeField] private float _size = 0.25f;
+
+    [SerializeField] private int _explosionId = 1;
+
     private EnemyState _currentState = EnemyState.Idle;
     private EnemyData _enemyData;
+
 
     public override void OnSpawn()
     {
@@ -25,12 +34,20 @@ public class InGameEnemy : PoolableObject
     public override void OnDespawn()
     {
         base.OnDespawn();
+        _enemyData = null;
+        OnEnemyDestroyed = null;
     }
 
     public void SetData(EnemyData enemyData, int waveLevel)
     {
-        _enemyData = enemyData;
+        _enemyData = enemyData.Copy();
         _enemyData.SetLevel(waveLevel);
+    }
+
+    public bool IsAlive()
+    {
+        if (_enemyData == null) return false;
+        return _enemyData.Hp > 0;
     }
 
     public void TakeDamage(double damage)
@@ -40,6 +57,8 @@ public class InGameEnemy : PoolableObject
         {
             _currentState = EnemyState.Destroy;
         }
+
+        Debug.Log($"Damage: {damage} Hp: {_enemyData.Hp}");
     }
 
     private void Update()
@@ -47,7 +66,7 @@ public class InGameEnemy : PoolableObject
         switch (_currentState)
         {
             case EnemyState.Moving:
-                if (Vector3.Distance(transform.position, InGameManager.Instance.GetPlanetTransform().position) <= _enemyData.AttackRange)
+                if (Vector3.Distance(transform.position, InGameManager.Instance.GetPlanetTransform().position) <= _enemyData.AttackRange + _size)
                 {
                     Debug.Log("행성에 도달했습니다.");
                     _currentState = EnemyState.Attacking;
@@ -72,8 +91,10 @@ public class InGameEnemy : PoolableObject
     {
         _currentState = EnemyState.Finish;
 
-        await AddressableManager.Instance.GetExplosion(1, transform.position, transform.parent);
-        InGameWaveManager.Instance.Enemies.Remove(this);
+        OnEnemyDestroyed?.Invoke(this);
+
+        await AddressableManager.Instance.GetExplosion(_explosionId, transform.position, transform.parent);
+        InGameWaveManager.Instance.RemoveEnemy(this);
         AddressableManager.Instance.ReturnToPool(this);
     }
 
@@ -94,5 +115,24 @@ public class InGameEnemy : PoolableObject
     {
         // 행성에 공격
         // InGameManager.Instance.GetPlanetTransform().GetComponent<InGamePlanet>().TakeDamage(_enemyData.AttackPower);
+    }
+
+    // 적의 크기를 원형으로 표시
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        int segments = 32;
+        Vector3 previousSizePoint = transform.position + new Vector3(_size, 0f, 0f);
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = (float)i / segments * 360f * Mathf.Deg2Rad;
+            Vector3 newSizePoint = transform.position + new Vector3(
+                Mathf.Cos(angle) * _size,
+                Mathf.Sin(angle) * _size,
+                0f
+            );
+            Gizmos.DrawLine(previousSizePoint, newSizePoint);
+            previousSizePoint = newSizePoint;
+        }
     }
 }

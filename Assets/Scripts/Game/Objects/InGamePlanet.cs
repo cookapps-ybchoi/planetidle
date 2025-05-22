@@ -4,9 +4,14 @@ using Game.ObjectPool;
 
 public class InGamePlanet : PoolableObject
 {
+    private const float RANGE_THICKNESS_DEFAULT = 0.03f;
+
     [SerializeField] private SpriteRenderer _planetSprite;
     [SerializeField] private SpriteRenderer _rangeSprite;
+
     private PlanetData _planetData;
+
+    private InGameEnemy _targetEnemy;
     private bool _canAttack = true;
 
     public override void OnSpawn()
@@ -34,32 +39,26 @@ public class InGamePlanet : PoolableObject
     {
         if (!_canAttack) return;
 
-        float range = _planetData.GetStatValue(PlanetStatType.Range);
-        float rangeSquared = range * range;
-
-        InGameEnemy closestEnemy = null;
-        float closestDistanceSquared = float.MaxValue;
-
-        foreach (var enemy in InGameWaveManager.Instance.Enemies)
+        if (_targetEnemy != null && _targetEnemy.IsAlive())
         {
-            if (enemy == null) continue;
+            StartCoroutine(AttackWithDelay(_targetEnemy));
+        }
+        else
+        {
+            float range = _planetData.GetStatValue(PlanetStatType.Range);
 
-            Vector3 direction = enemy.transform.position - transform.position;
-            float distanceSquared = direction.sqrMagnitude;
-
-            if (distanceSquared <= rangeSquared && distanceSquared < closestDistanceSquared)
+            _targetEnemy = InGameWaveManager.Instance.GetTargetEnemy(transform.position, range);
+            if (_targetEnemy != null)
             {
-                closestEnemy = enemy;
-                closestDistanceSquared = distanceSquared;
+                _targetEnemy.OnEnemyDestroyed += OnTargetEnemyDestroyed;
+                StartCoroutine(AttackWithDelay(_targetEnemy));
             }
         }
+    }
 
-        if (closestEnemy != null)
-        {
-            float actualDistance = Mathf.Sqrt(closestDistanceSquared);
-            Debug.Log($"공격 대상 : {closestEnemy.name}, 거리: {actualDistance:F2}, 범위: {range:F2}");
-            StartCoroutine(AttackWithDelay(closestEnemy));
-        }
+    private void OnTargetEnemyDestroyed(InGameEnemy enemy)
+    {
+        _targetEnemy = null;
     }
 
     private IEnumerator AttackWithDelay(InGameEnemy enemy)
@@ -81,8 +80,8 @@ public class InGamePlanet : PoolableObject
         float range = _planetData.GetStatValue(PlanetStatType.Range) * 2f;
         _rangeSprite.transform.localScale = new Vector3(range, range, 1);
 
-        //기본 두께는 0.05 기준 range 1. range 증가 값에 역비례
-        _rangeSprite.material.SetFloat("_Thickness", 0.03f / range);
+        //기본 두께는 0.03 기준 range 1. range 증가 값에 역비례
+        _rangeSprite.material.SetFloat("_Thickness", RANGE_THICKNESS_DEFAULT / range);
     }
 
     //InGameBullet 을 생성하여 적에게 공격
