@@ -41,10 +41,9 @@ public class DistanceGizmo2D : MonoBehaviour
             previousPoint = newPoint;
         }
 
-        // 원의 지름 계산 및 표시
-        float diameter = radius * 2f;
+        // 원의 반지름 표시
         Vector3 textPosition = center + new Vector3(0f, radius + 0.2f, 0f);
         UnityEditor.Handles.color = textColor;
-        UnityEditor.Handles.Label(textPosition, diameter.ToString("F2"));
+        UnityEditor.Handles.Label(textPosition, radius.ToString("F2"));
     }
 } 
