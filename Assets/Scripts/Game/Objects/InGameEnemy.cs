@@ -8,6 +8,7 @@ public class InGameEnemy : MonoBehaviour, InGameObject
         Moving,
         Attacking,
         Destroy,
+        Finish,
     }
 
     private EnemyState _currentState = EnemyState.Idle;
@@ -56,14 +57,19 @@ public class InGameEnemy : MonoBehaviour, InGameObject
                 break;
 
             case EnemyState.Destroy:
-                Destroy(gameObject);
+                Finish();
                 break;
         }
     }
 
-    private void OnDestroy()
+    private async void Finish()
     {
+        _currentState = EnemyState.Finish;
+
+        InGameExplosion explosion = await AddressableManager.Instance.GetExplosion(1, transform.position, transform.parent);
+        explosion.Initialize();
         InGameWaveManager.Instance.Enemies.Remove(this);
+        ObjectPoolManager.Instance.ReturnToPool(gameObject.name, gameObject);
     }
 
     // 행성을 바라봄

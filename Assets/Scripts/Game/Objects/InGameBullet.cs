@@ -7,6 +7,7 @@ public class InGameBullet : MonoBehaviour, InGameObject
         Idle,
         Moving,
         Destroy,
+        Finish,
     }
 
     private BulletState _currentState = BulletState.Idle;
@@ -44,7 +45,7 @@ public class InGameBullet : MonoBehaviour, InGameObject
                 }
                 break;
             case BulletState.Destroy:
-                Destroy(gameObject);
+                Finish();
                 break;
         }
     }
@@ -52,5 +53,12 @@ public class InGameBullet : MonoBehaviour, InGameObject
     private void MoveToTarget()
     {
         transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, Constants.PLANET_BULLET_SPEED * Time.deltaTime);
+    }
+
+    private void Finish()
+    {
+        _currentState = BulletState.Finish;
+        
+        ObjectPoolManager.Instance.ReturnToPool(gameObject.name, gameObject);
     }
 }

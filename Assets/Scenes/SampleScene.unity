@@ -5377,7 +5377,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d929feb60f869946850435d57fa56b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultPoolSize: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

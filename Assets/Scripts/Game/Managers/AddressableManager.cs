@@ -46,6 +46,11 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
         return await GetGameObject<InGameBullet>(prefabConfig.InGameBullet, bulletId, position, parent);
     }
 
+    public async Task<InGameExplosion> GetExplosion(int explosionId, Vector3 position = default, Transform parent = null)
+    {
+        return await GetGameObject<InGameExplosion>(prefabConfig.InGameExplosion, explosionId, position, parent);
+    }
+
     /// <summary>
     /// 오브젝트를 풀로 반환합니다.
     /// </summary>

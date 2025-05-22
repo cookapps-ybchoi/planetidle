@@ -45,6 +45,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - InGame
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c1ea425e183c7dd4180447afe0df2822
+    m_Address: InGame/FX_Explosion_001
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InGame
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 9b76c746759b824469e107627dec51be, type: 2}
   m_SchemaSet:

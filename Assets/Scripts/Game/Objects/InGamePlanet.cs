@@ -79,13 +79,13 @@ public class InGamePlanet : MonoBehaviour, InGameObject
         _rangeSprite.transform.localScale = new Vector3(range, range, 1);
 
         //기본 두께는 0.05 기준 range 1. range 증가 값에 역비례
-        _rangeSprite.material.SetFloat("_Thickness", 0.05f / range);
+        _rangeSprite.material.SetFloat("_Thickness", 0.03f / range);
     }
 
     //InGameBullet 을 생성하여 적에게 공격
     private async void Attack(InGameEnemy enemy)
     {
-        InGameBullet bullet = await AddressableManager.Instance.GetBullet(1, transform.position, transform);
+        InGameBullet bullet = await AddressableManager.Instance.GetBullet(1, transform.position, transform.parent);
         bullet.Initialize();
         bullet.SetTarget(enemy);
     }

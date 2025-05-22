@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 
 public class ObjectPoolManager : GameObjectSingleton<ObjectPoolManager>
 {
+    private const int DEFAULT_POOL_SIZE = 5;
     private readonly Dictionary<string, Queue<GameObject>> _poolDictionary = new();
     private readonly Dictionary<string, GameObject> _prefabDictionary = new();
     private readonly Dictionary<string, int> _poolSizes = new();
-
-    [SerializeField] private readonly int _defaultPoolSize = 20;
 
     public async Task<T> GetFromPool<T>(string address, Vector3 position = default, Transform parent = null) where T : Component
     {
@@ -53,9 +52,9 @@ public class ObjectPoolManager : GameObjectSingleton<ObjectPoolManager>
         {
             _prefabDictionary[address] = handle.Result;
             _poolDictionary[address] = new Queue<GameObject>();
-            _poolSizes[address] = _defaultPoolSize;
+            _poolSizes[address] = DEFAULT_POOL_SIZE;
 
-            for (int i = 0; i < _defaultPoolSize; i++)
+            for (int i = 0; i < DEFAULT_POOL_SIZE; i++)
             {
                 CreateNewInstance(address);
             }
