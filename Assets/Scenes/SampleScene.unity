@@ -5290,6 +5290,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2119405036}
   - component: {fileID: 2119405037}
+  - component: {fileID: 2119405041}
   - component: {fileID: 2119405039}
   - component: {fileID: 2119405038}
   - component: {fileID: 2119405040}
@@ -5364,6 +5365,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd589d2959d20b34f95df9854f555dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2119405041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2119405035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d929feb60f869946850435d57fa56b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultPoolSize: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

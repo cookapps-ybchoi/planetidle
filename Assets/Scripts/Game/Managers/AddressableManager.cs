@@ -8,49 +8,49 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
     [SerializeField] private PrefabAddressConfig prefabConfig;
 
     /// <summary>
-    /// 파라미터로 행성 아이디를 받아 행성 프리펩을 생성
+    /// 제네릭 메서드를 사용하여 게임 오브젝트를 풀에서 가져옵니다.
     /// </summary>
-    public async Task<InGamePlanet> GetPlanet(int planetId, Vector3 position = default, Transform parent = null)
+    /// <typeparam name="T">가져올 게임 오브젝트의 타입</typeparam>
+    /// <param name="objectType">오브젝트 타입 (예: InGamePlanet, InGameEnemy 등)</param>
+    /// <param name="objectId">오브젝트 ID</param>
+    /// <param name="position">생성 위치</param>
+    /// <param name="parent">부모 Transform</param>
+    /// <returns>생성된 게임 오브젝트</returns>
+    public async Task<T> GetGameObject<T>(string objectType, int objectId, Vector3 position = default, Transform parent = null) where T : Component
     {
-        //아이디는 3자리 숫자로 표시
-        string address = $"{prefabConfig.InGamePlanet}_{planetId:D3}";
-        return await InstantiateAsync<InGamePlanet>(address, position, parent);
-    }
-
-    public async Task<InGameEnemy> GetEnemy(int enemyId, Vector3 position = default, Transform parent = null)
-    {
-        string address = $"{prefabConfig.InGameEnemy}_{enemyId:D3}";
-        return await InstantiateAsync<InGameEnemy>(address, position, parent);
-    }
-
-    public async Task<InGameBullet> GetBullet(int bulletId, Vector3 position = default, Transform parent = null)
-    {
-        string address = $"{prefabConfig.InGameBullet}_{bulletId:D3}";
-        return await InstantiateAsync<InGameBullet>(address, position, parent);
+        string address = $"{objectType}_{objectId:D3}";
+        return await ObjectPoolManager.Instance.GetFromPool<T>(address, position, parent);
     }
 
     /// <summary>
-    /// 주소로부터 오브젝트를 생성하고 T 컴포넌트를 반환
+    /// 행성 오브젝트를 풀에서 가져옵니다.
     /// </summary>
-    private async Task<T> InstantiateAsync<T>(string address, Vector3 position = default, Transform parent = null) where T : Component
+    public async Task<InGamePlanet> GetPlanet(int planetId, Vector3 position = default, Transform parent = null)
     {
-        AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>(address);
-        await handle.Task;
+        return await GetGameObject<InGamePlanet>(prefabConfig.InGamePlanet, planetId, position, parent);
+    }
 
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
-            GameObject obj = Instantiate(handle.Result, position, Quaternion.identity, parent);
-            T component = obj.GetComponent<T>();
-            if (component == null)
-            {
-                Debug.LogWarning($"[{address}]에 {typeof(T).Name} 컴포넌트가 없습니다.");
-            }
-            return component;
-        }
-        else
-        {
-            Debug.LogError($"Failed to load addressable at: {address}");
-            return null;
-        }
+    /// <summary>
+    /// 적 오브젝트를 풀에서 가져옵니다.
+    /// </summary>
+    public async Task<InGameEnemy> GetEnemy(int enemyId, Vector3 position = default, Transform parent = null)
+    {
+        return await GetGameObject<InGameEnemy>(prefabConfig.InGameEnemy, enemyId, position, parent);
+    }
+
+    /// <summary>
+    /// 총알 오브젝트를 풀에서 가져옵니다.
+    /// </summary>
+    public async Task<InGameBullet> GetBullet(int bulletId, Vector3 position = default, Transform parent = null)
+    {
+        return await GetGameObject<InGameBullet>(prefabConfig.InGameBullet, bulletId, position, parent);
+    }
+
+    /// <summary>
+    /// 오브젝트를 풀로 반환합니다.
+    /// </summary>
+    public void ReturnToPool(GameObject obj)
+    {
+        ObjectPoolManager.Instance.ReturnToPool(obj.name, obj);
     }
 }

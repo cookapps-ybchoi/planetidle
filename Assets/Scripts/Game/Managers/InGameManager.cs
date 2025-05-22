@@ -21,6 +21,9 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         // 데이터 초기화
         DataManager.Instance.Initialize();
 
+        // ObjectPoolManager 인스턴스 대기
+        await WaitForInstance(ObjectPoolManager.Instance);
+
         // AddressableManager 인스턴스 대기
         await WaitForInstance(AddressableManager.Instance);
 
