@@ -99,11 +99,11 @@ public class PlanetData
     {
         return statType switch
         {
-            PlanetStatType.AttackPower => Constants.ATTACK_POWER_PER_LEVEL,
-            PlanetStatType.AttackSpeed => Constants.ATTACK_SPEED_PER_LEVEL,
-            PlanetStatType.Range => Constants.RANGE_PER_LEVEL,
-            PlanetStatType.Hp => Constants.HP_PER_LEVEL,
-            PlanetStatType.HpRecovery => Constants.HP_RECOVERY_PER_LEVEL,
+            PlanetStatType.AttackPower => Constants.PLANET_ATTACK_POWER_PER_LEVEL,
+            PlanetStatType.AttackSpeed => Constants.PLANET_ATTACK_SPEED_PER_LEVEL,
+            PlanetStatType.Range => Constants.PLANET_RANGE_PER_LEVEL,
+            PlanetStatType.Hp => Constants.PLANET_HP_PER_LEVEL,
+            PlanetStatType.HpRecovery => Constants.PLANET_HP_RECOVERY_PER_LEVEL,
             _ => 1f
         };
     }
@@ -112,7 +112,9 @@ public class PlanetData
     {
         return statType switch
         {
-            PlanetStatType.Range => Constants.DEFAULT_RANGE,
+            PlanetStatType.Range => Constants.PLANET_RANGE_DEFUALT,
+            PlanetStatType.AttackPower => Constants.PLANET_ATTACK_POWER_DEFAULT,
+            PlanetStatType.AttackSpeed => Constants.PLANET_ATTACK_SPEED_DEFAULT,
             _ => 0f
         };
     }

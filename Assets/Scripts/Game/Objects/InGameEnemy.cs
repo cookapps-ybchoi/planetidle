@@ -6,7 +6,8 @@ public class InGameEnemy : MonoBehaviour, InGameObject
     {
         Idle,
         Moving,
-        Attacking
+        Attacking,
+        Destroy,
     }
 
     private EnemyState _currentState = EnemyState.Idle;
@@ -18,10 +19,21 @@ public class InGameEnemy : MonoBehaviour, InGameObject
         _currentState = EnemyState.Moving;
     }
 
-    public void SetData(EnemyData enemyData)
+    public void SetData(EnemyData enemyData, int waveLevel)
     {
         _enemyData = enemyData;
-    }   
+        _enemyData.SetLevel(waveLevel);
+        Debug.Log($"적 레벨: {_enemyData.EnemyLevel}, 체력: {_enemyData.Hp}");
+    }
+
+    public void TakeDamage(double damage)
+    {
+        _enemyData.ChangeHp(-damage);
+        if (_enemyData.Hp <= 0)
+        {
+            _currentState = EnemyState.Destroy;
+        }
+    }
 
     private void Update()
     {
@@ -42,7 +54,16 @@ public class InGameEnemy : MonoBehaviour, InGameObject
             case EnemyState.Attacking:
                 AttackPlanet();
                 break;
+
+            case EnemyState.Destroy:
+                Destroy(gameObject);
+                break;
         }
+    }
+
+    private void OnDestroy()
+    {
+        InGameWaveManager.Instance.Enemies.Remove(this);
     }
 
     // 행성을 바라봄

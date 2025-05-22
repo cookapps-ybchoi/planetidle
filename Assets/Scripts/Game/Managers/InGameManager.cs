@@ -48,6 +48,11 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         InGameWaveManager.Instance.StartWave();
     }
 
+    public double GetPlanetAttackPower()
+    {
+        return DataManager.Instance.PlanetData.GetStatValue(PlanetStatType.AttackPower);
+    }
+
     private async Task WaitForInstance<T>(T instance) where T : class
     {
         while (instance == null) await Task.Yield();

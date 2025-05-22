@@ -23,6 +23,12 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
         return await InstantiateAsync<InGameEnemy>(address, position, parent);
     }
 
+    public async Task<InGameBullet> GetBullet(int bulletId, Vector3 position = default, Transform parent = null)
+    {
+        string address = $"{prefabConfig.InGameBullet}_{bulletId:D3}";
+        return await InstantiateAsync<InGameBullet>(address, position, parent);
+    }
+
     /// <summary>
     /// 주소로부터 오브젝트를 생성하고 T 컴포넌트를 반환
     /// </summary>
