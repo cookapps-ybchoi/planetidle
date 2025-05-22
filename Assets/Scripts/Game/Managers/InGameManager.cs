@@ -1,8 +1,6 @@
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
+using Game.ObjectPool;
 
 public class InGameManager : GameObjectSingleton<InGameManager>
 {
@@ -37,7 +35,7 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         await WaitForInstance(InGameWaveManager.Instance);
 
         // InGameWaveManager 초기화
-        InGameWaveManager.Instance.Initialize();
+        await InGameWaveManager.Instance.Initialize();
 
         // 행성 생성
         await CreatePlanet();
@@ -62,7 +60,6 @@ public class InGameManager : GameObjectSingleton<InGameManager>
     private async Task CreatePlanet()
     {
         _planet = await AddressableManager.Instance.GetPlanet(DataManager.Instance.PlanetData.PlanetId, Vector3.zero, transform);
-        _planet.Initialize();
     }
 
     private async Task Preload()
@@ -75,6 +72,9 @@ public class InGameManager : GameObjectSingleton<InGameManager>
 
         InGameExplosion explosion = await AddressableManager.Instance.GetExplosion(1, Vector3.zero, transform);
         explosion.gameObject.SetActive(false);
+
+        InGameDamage damage = await AddressableManager.Instance.GetDamage(Vector3.zero, transform);
+        damage.gameObject.SetActive(false);
     }
 
     private async Task WaitForInstance<T>(T instance) where T : class

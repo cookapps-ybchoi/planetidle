@@ -1,6 +1,7 @@
 using UnityEngine;
+using Game.ObjectPool;
 
-public class InGameEnemy : MonoBehaviour, InGameObject
+public class InGameEnemy : PoolableObject
 {
     private enum EnemyState
     {
@@ -14,17 +15,22 @@ public class InGameEnemy : MonoBehaviour, InGameObject
     private EnemyState _currentState = EnemyState.Idle;
     private EnemyData _enemyData;
 
-    public void Initialize()
+    public override void OnSpawn()
     {
+        base.OnSpawn();
         LookAtPlanet();
         _currentState = EnemyState.Moving;
+    }
+
+    public override void OnDespawn()
+    {
+        base.OnDespawn();
     }
 
     public void SetData(EnemyData enemyData, int waveLevel)
     {
         _enemyData = enemyData;
         _enemyData.SetLevel(waveLevel);
-        Debug.Log($"적 레벨: {_enemyData.EnemyLevel}, 체력: {_enemyData.Hp}");
     }
 
     public void TakeDamage(double damage)
@@ -66,10 +72,9 @@ public class InGameEnemy : MonoBehaviour, InGameObject
     {
         _currentState = EnemyState.Finish;
 
-        InGameExplosion explosion = await AddressableManager.Instance.GetExplosion(1, transform.position, transform.parent);
-        explosion.Initialize();
+        await AddressableManager.Instance.GetExplosion(1, transform.position, transform.parent);
         InGameWaveManager.Instance.Enemies.Remove(this);
-        ObjectPoolManager.Instance.ReturnToPool(gameObject.name, gameObject);
+        AddressableManager.Instance.ReturnToPool(this);
     }
 
     // 행성을 바라봄

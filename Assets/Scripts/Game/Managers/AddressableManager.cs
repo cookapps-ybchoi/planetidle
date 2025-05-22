@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using System.Threading.Tasks;
+using Game.ObjectPool;
 
 public class AddressableManager : GameObjectSingleton<AddressableManager>
 {
@@ -23,9 +22,8 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
     /// <param name="position">생성 위치</param>
     /// <param name="parent">부모 Transform</param>
     /// <returns>생성된 게임 오브젝트</returns>
-    public async Task<T> GetGameObject<T>(string objectType, int objectId, Vector3 position = default, Transform parent = null) where T : Component
+    public async Task<T> GetGameObject<T>(string address, Vector3 position = default, Transform parent = null) where T : Component
     {
-        string address = $"{objectType}_{objectId:D3}";
         return await ObjectPoolManager.Instance.GetFromPool<T>(address, position, parent);
     }
 
@@ -34,7 +32,8 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
     /// </summary>
     public async Task<InGamePlanet> GetPlanet(int planetId, Vector3 position = default, Transform parent = null)
     {
-        return await GetGameObject<InGamePlanet>(prefabConfig.InGamePlanet, planetId, position, parent);
+        string address = $"{prefabConfig.InGamePlanet}_{planetId:D3}";
+        return await GetGameObject<InGamePlanet>(address, position, parent);
     }
 
     /// <summary>
@@ -42,7 +41,8 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
     /// </summary>
     public async Task<InGameEnemy> GetEnemy(int enemyId, Vector3 position = default, Transform parent = null)
     {
-        return await GetGameObject<InGameEnemy>(prefabConfig.InGameEnemy, enemyId, position, parent);
+        string address = $"{prefabConfig.InGameEnemy}_{enemyId:D3}";
+        return await GetGameObject<InGameEnemy>(address, position, parent);
     }
 
     /// <summary>
@@ -50,18 +50,25 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
     /// </summary>
     public async Task<InGameBullet> GetBullet(int bulletId, Vector3 position = default, Transform parent = null)
     {
-        return await GetGameObject<InGameBullet>(prefabConfig.InGameBullet, bulletId, position, parent);
+        string address = $"{prefabConfig.InGameBullet}_{bulletId:D3}";
+        return await GetGameObject<InGameBullet>(address, position, parent);
     }
 
     public async Task<InGameExplosion> GetExplosion(int explosionId, Vector3 position = default, Transform parent = null)
     {
-        return await GetGameObject<InGameExplosion>(prefabConfig.InGameExplosion, explosionId, position, parent);
+        string address = $"{prefabConfig.InGameExplosion}_{explosionId:D3}";
+        return await GetGameObject<InGameExplosion>(address, position, parent);
+    }
+
+    public async Task<InGameDamage> GetDamage(Vector3 position = default, Transform parent = null)
+    {
+        return await GetGameObject<InGameDamage>(prefabConfig.InGameDamage, position, parent);
     }
 
     /// <summary>
     /// 오브젝트를 풀로 반환합니다.
     /// </summary>
-    public void ReturnToPool(GameObject obj)
+    public void ReturnToPool(PoolableObject obj)
     {
         ObjectPoolManager.Instance.ReturnToPool(obj.name, obj);
     }

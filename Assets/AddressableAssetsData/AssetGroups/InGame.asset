@@ -27,6 +27,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - InGame
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 550126ba3b3ae8b448c9b9f3cd2acad8
+    m_Address: InGame/Damage
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InGame
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6fa6aff94b8b7694899fa5b2f1593920
     m_Address: InGame/Enemy_002
     m_ReadOnly: 0

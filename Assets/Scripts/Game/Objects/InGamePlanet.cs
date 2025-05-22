@@ -1,21 +1,27 @@
 using UnityEngine;
-using System.Threading.Tasks;
 using System.Collections;
+using Game.ObjectPool;
 
-public class InGamePlanet : MonoBehaviour, InGameObject
+public class InGamePlanet : PoolableObject
 {
     [SerializeField] private SpriteRenderer _planetSprite;
     [SerializeField] private SpriteRenderer _rangeSprite;
     private PlanetData _planetData;
     private bool _canAttack = true;
 
-    public void Initialize()
+    public override void OnSpawn()
     {
+        base.OnSpawn();
         // 행성 데이터
         _planetData = DataManager.Instance.PlanetData;
 
         // 초기화 시 범위 표시 업데이트
         DrawRange();
+    }
+
+    public override void OnDespawn()
+    {
+        base.OnDespawn();
     }
 
     private void Update()
@@ -33,9 +39,6 @@ public class InGamePlanet : MonoBehaviour, InGameObject
 
         InGameEnemy closestEnemy = null;
         float closestDistanceSquared = float.MaxValue;
-
-        Debug.Log($"전체 적 수: {InGameWaveManager.Instance.Enemies.Count}");
-        Debug.Log($"현재 행성 범위: {range}");
 
         foreach (var enemy in InGameWaveManager.Instance.Enemies)
         {
@@ -63,12 +66,12 @@ public class InGamePlanet : MonoBehaviour, InGameObject
     {
         _canAttack = false;
         Attack(enemy);
-        
+
         // 공격 속도에 따른 딜레이 계산 (공격 속도가 높을수록 딜레이 감소)
         float attackSpeed = _planetData.GetStatValue(PlanetStatType.AttackSpeed);
         float baseDelay = Constants.PLANET_ATTACK_DELAY_DEFUALT; // 기본 딜레이
         float delay = baseDelay / attackSpeed;
-        
+
         yield return new WaitForSeconds(delay);
         _canAttack = true;
     }
@@ -86,7 +89,6 @@ public class InGamePlanet : MonoBehaviour, InGameObject
     private async void Attack(InGameEnemy enemy)
     {
         InGameBullet bullet = await AddressableManager.Instance.GetBullet(1, transform.position, transform.parent);
-        bullet.Initialize();
         bullet.SetTarget(enemy);
     }
 }

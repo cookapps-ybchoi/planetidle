@@ -1,6 +1,7 @@
 using UnityEngine;
+using Game.ObjectPool;
 
-public class InGameBullet : MonoBehaviour, InGameObject
+public class InGameBullet : PoolableObject
 {
     private enum BulletState
     {
@@ -13,10 +14,16 @@ public class InGameBullet : MonoBehaviour, InGameObject
     private BulletState _currentState = BulletState.Idle;
     private InGameEnemy _target;
 
-    public void Initialize()
+    public override void OnSpawn()
     {
+        base.OnSpawn();
         _target = null;
         _currentState = BulletState.Idle;
+    }
+
+    public override void OnDespawn()
+    {
+        base.OnDespawn();
     }
 
     public void SetTarget(InGameEnemy target)
@@ -36,7 +43,9 @@ public class InGameBullet : MonoBehaviour, InGameObject
                 }
                 else if(Vector3.Distance(transform.position, _target.transform.position) <= 0.1f)
                 {
-                    _target.TakeDamage(InGameManager.Instance.GetPlanetAttackPower());
+                    double damage = InGameManager.Instance.GetPlanetAttackPower();
+                    ShowDamage(damage);
+                    _target.TakeDamage(damage);
                     _currentState = BulletState.Destroy;
                 }
                 else
@@ -55,10 +64,15 @@ public class InGameBullet : MonoBehaviour, InGameObject
         transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, Constants.PLANET_BULLET_SPEED * Time.deltaTime);
     }
 
+    private async void ShowDamage(double damage)
+    {
+        InGameDamage damageObject = await AddressableManager.Instance.GetDamage(transform.position, transform.parent);
+        damageObject.SetDamage(damage);
+    }   
+
     private void Finish()
     {
         _currentState = BulletState.Finish;
-        
-        ObjectPoolManager.Instance.ReturnToPool(gameObject.name, gameObject);
+        AddressableManager.Instance.ReturnToPool(this);
     }
 }

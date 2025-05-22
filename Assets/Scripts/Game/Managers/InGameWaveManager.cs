@@ -10,9 +10,10 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 
     public List<InGameEnemy> Enemies => _enemies;
 
-    public void Initialize()
+    public async Task Initialize()
     {
         _currentWaveLevel = 1;
+        await Task.CompletedTask;
     }
 
     public void StartWave()
@@ -60,7 +61,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             }
 
             InGameEnemy enemy = await SpawnEnemy(randomEnemyId);
-            enemy.Initialize();
             enemy.SetData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == randomEnemyId), waveData.WaveLevel);
             _enemies.Add(enemy);
             await Task.Delay((int)(waveData.SpawnInterval * 1000));

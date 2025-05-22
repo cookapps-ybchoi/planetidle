@@ -1,10 +1,16 @@
 using UnityEngine;
+using Game.ObjectPool;
 
-public class InGameExplosion : MonoBehaviour, InGameObject  
+public class InGameExplosion : PoolableObject
 {
-    public void Initialize()
+    public override void OnSpawn()
     {
-        
+        base.OnSpawn();
+    }
+
+    public override void OnDespawn()
+    {
+        base.OnDespawn();
     }
 
     protected void OnParticleSystemStopped()
@@ -14,6 +20,6 @@ public class InGameExplosion : MonoBehaviour, InGameObject
 
     private void Finish()
     {
-        ObjectPoolManager.Instance.ReturnToPool(gameObject.name, gameObject);
+        AddressableManager.Instance.ReturnToPool(this);
     }
 }
