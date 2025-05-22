@@ -5,7 +5,14 @@ using System.Threading.Tasks;
 
 public class AddressableManager : GameObjectSingleton<AddressableManager>
 {
+    public PrefabAddressConfig PrefabAddressConfig => prefabConfig;
+
     [SerializeField] private PrefabAddressConfig prefabConfig;
+
+    public async Task Initialize()
+    {
+        await Task.CompletedTask;
+    }
 
     /// <summary>
     /// 제네릭 메서드를 사용하여 게임 오브젝트를 풀에서 가져옵니다.

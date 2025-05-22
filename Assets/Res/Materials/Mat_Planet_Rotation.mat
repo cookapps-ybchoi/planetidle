@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Rotation
+  m_Name: Mat_Planet_Rotation
   m_Shader: {fileID: 4800000, guid: 5e8b3e004fec6d046a52f8cc56fd9be3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

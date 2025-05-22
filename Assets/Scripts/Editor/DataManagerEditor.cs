@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Threading.Tasks;
 
 [CustomEditor(typeof(DataManager))]
 public class DataManagerEditor : Editor
@@ -19,8 +20,13 @@ public class DataManagerEditor : Editor
                 "정말로 모든 저장 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
                 "삭제", "취소"))
             {
-                dataManager.DeleteSaveData();
+                DeleteSaveData(dataManager);
             }
         }
     }
-} 
+
+    private async void DeleteSaveData(DataManager dataManager)
+    {
+        await dataManager.DeleteSaveDataAsync();
+    }
+}   

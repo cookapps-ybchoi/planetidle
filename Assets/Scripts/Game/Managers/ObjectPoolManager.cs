@@ -9,6 +9,21 @@ public class ObjectPoolManager : GameObjectSingleton<ObjectPoolManager>
     private readonly Dictionary<string, GameObject> _prefabDictionary = new();
     private readonly Dictionary<string, int> _poolSizes = new();
 
+    public async Task Initialize(string[] addresses = null)
+    {
+        _poolDictionary.Clear();
+        _prefabDictionary.Clear();
+        _poolSizes.Clear();
+
+        if (addresses != null)
+        {
+            foreach (var address in addresses)
+            {
+                await InitializePool(address);
+            }
+        }
+    }
+
     public async Task<T> GetFromPool<T>(string address, Vector3 position = default, Transform parent = null) where T : Component
     {
         if (!_poolDictionary.ContainsKey(address))

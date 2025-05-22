@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class DataManager : GameObjectSingleton<DataManager>
 {
@@ -13,16 +14,16 @@ public class DataManager : GameObjectSingleton<DataManager>
     public List<EnemyData> EnemyDataList => _enemyDatas;
     public List<WaveData> WaveDataList => _waveDatas;
 
-    public void Initialize()
+    public async Task Initialize()
     {
-        _planetData = LoadPlanetData();
+        _planetData = await LoadPlanetDataAsync();
         _enemyDatas = LoadEnemyDatas();
         _waveDatas = LoadWaveDatas();
     }
 
-    public void Save()
+    public async Task SaveAsync()
     {
-        SavePlanetData();
+        await SavePlanetDataAsync();
     }
 
     private PlanetData CreatePlanetData()
@@ -31,7 +32,7 @@ public class DataManager : GameObjectSingleton<DataManager>
         return _planetData;
     }
 
-    private void SavePlanetData()
+    private async Task SavePlanetDataAsync()
     {
         if (_planetData == null)
         {
@@ -42,7 +43,7 @@ public class DataManager : GameObjectSingleton<DataManager>
         try
         {
             string jsonData = JsonUtility.ToJson(_planetData, true);
-            File.WriteAllText(_planetSavePath, jsonData);
+            await File.WriteAllTextAsync(_planetSavePath, jsonData);
             Debug.Log($"데이터가 성공적으로 저장되었습니다: {_planetSavePath}");
         }
         catch (System.Exception e)
@@ -51,7 +52,7 @@ public class DataManager : GameObjectSingleton<DataManager>
         }
     }
 
-    private PlanetData LoadPlanetData()
+    private async Task<PlanetData> LoadPlanetDataAsync()
     {
         if (!File.Exists(_planetSavePath))
         {
@@ -61,7 +62,7 @@ public class DataManager : GameObjectSingleton<DataManager>
 
         try
         {
-            string jsonData = File.ReadAllText(_planetSavePath);
+            string jsonData = await File.ReadAllTextAsync(_planetSavePath);
             _planetData = JsonUtility.FromJson<PlanetData>(jsonData);
             Debug.Log("데이터를 성공적으로 불러왔습니다.");
             return _planetData;
@@ -100,13 +101,13 @@ public class DataManager : GameObjectSingleton<DataManager>
         return waveDatas;
     }
 
-    public void DeleteSaveData()
+    public async Task DeleteSaveDataAsync()
     {
         if (File.Exists(_planetSavePath))
         {
             try
             {
-                File.Delete(_planetSavePath);
+                await Task.Run(() => File.Delete(_planetSavePath));
                 Debug.Log("저장된 데이터가 삭제되었습니다.");
             }
             catch (System.Exception e)
