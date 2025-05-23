@@ -29,19 +29,26 @@ public class InGameBullet : PoolableObject
     public void SetTarget(InGameEnemy target)
     {
         _target = target;
+        _target.OnEnemyDestroyed += OnTargetDestroyed;
         _currentState = BulletState.Moving;
+    }
+
+    private void OnTargetDestroyed(InGameEnemy enemy)
+    {
+        enemy.OnEnemyDestroyed -= OnTargetDestroyed;
+        _target = null;
     }
 
     private void Update()
     {
-        switch (_currentState)  
+        switch (_currentState)
         {
             case BulletState.Moving:
                 if (_target == null)
                 {
                     _currentState = BulletState.Destroy;
                 }
-                else if(Vector3.Distance(transform.position, _target.transform.position) <= 0.1f)
+                else if (Vector3.Distance(transform.position, _target.transform.position) <= 0.1f)
                 {
                     double damage = InGameManager.Instance.GetPlanetAttackPower();
                     ShowDamage(damage);
@@ -68,7 +75,7 @@ public class InGameBullet : PoolableObject
     {
         InGameDamage damageObject = await AddressableManager.Instance.GetDamage(transform.position, transform.parent);
         damageObject.SetDamage(damage);
-    }   
+    }
 
     private void Finish()
     {

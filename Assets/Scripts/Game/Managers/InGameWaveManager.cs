@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
+using System;
+using System.Collections;
 
 public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 {
@@ -10,6 +12,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     private WaveData _waveData = null;
     private int _currentWaveLevel = 1;
     private int _currentSpawnCount = 0;
+    private float _totalSpawnRate = 0f;
 
     public async Task Initialize()
     {
@@ -27,65 +30,97 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         return (float)_currentSpawnCount / (float)_waveData.TotalSpawnCount;
     }
 
-    public void StartWave()
+    //웨이브 시작
+    //웨이브 데이터가 없으면 가장 마지막 웨이브 반복
+    public void StartWave(int waveLevel = 1)
     {
-        _waveData = DataManager.Instance.WaveDataList.Find(data => data.WaveLevel == _currentWaveLevel);
-        if (_waveData == null)
+        if (InGameManager.Instance.IsPlaying)
         {
-            //웨이브 데이터가 없으면 가장 마지막 웨이브 반복
-            _waveData = DataManager.Instance.WaveDataList.Last();
-        }
+            _currentWaveLevel = waveLevel;
+            _waveData = DataManager.Instance.WaveDataList.Find(data => data.WaveLevel == _currentWaveLevel);
+            if (_waveData == null)
+            {
+                //웨이브 데이터가 없으면 가장 마지막 웨이브 반복
+                _waveData = DataManager.Instance.WaveDataList.Last();
+            }
 
-        // 총 생산 횟수, 생산간격, 적타입(ID)
-        SpawnEnemies(_waveData);
+            // SpawnRates 합산 미리 계산
+            _totalSpawnRate = _waveData.SpawnRates.Sum();
+
+            InGameEventManager.Instance.InvokeWaveStart(_currentWaveLevel);
+            StartCoroutine(SpawnEnemies(_waveData));
+        }
     }
 
-    // 정해진 규칙동안 적을 생산하는 함수
-    // 파라미터, 생산 횟수, 생산간격, 적타입(ID)
-    private async void SpawnEnemies(WaveData waveData)
+    public void StopWave()
+    {
+        _waveData = null;
+        //전체 적 제거
+        foreach (var enemy in _enemies)
+        {
+            enemy.Finish();
+        }
+        _enemies.Clear();
+    }
+
+    private IEnumerator SpawnEnemies(WaveData waveData)
     {
         _currentSpawnCount = 0;
 
-        // SpawnRates의 전체 합산 계산
-        float totalRate = 0f;
-        foreach (float rate in waveData.SpawnRates)
-        {
-            totalRate += rate;
-        }
-
-        // 생산 횟수만큼 적을 생산하는 함수
         for (int i = 0; i < waveData.SpawnCount; i++)
         {
-            //BatchCount만큼 적을 생산
             for (int j = 0; j < waveData.BatchCount; j++)
             {
-                // 랜덤 적 생성, SpawnRates 비율에 따라 적 생성
-                float randomValue = Random.Range(0f, totalRate);
-                float currentSum = 0f;
-                int randomEnemyId = 1; // 기본값으로 첫 번째 적 설정
-
-                for (int k = 0; k < waveData.SpawnRates.Length; k++)
-                {
-                    currentSum += waveData.SpawnRates[k];
-                    if (randomValue <= currentSum)
-                    {
-                        randomEnemyId = waveData.SpawnIds[j];
-                        break;
-                    }
-                }
-
-                InGameEnemy enemy = await SpawnEnemy(randomEnemyId);
-                enemy.SetData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == randomEnemyId), waveData.WaveLevel);
-                _enemies.Add(enemy);
+                int randomEnemyId = GetRandomEnemyId(waveData);
+                StartCoroutine(SpawnEnemyCoroutine(randomEnemyId));
                 _currentSpawnCount++;
+
+                InGameEventManager.Instance.InvokeWaveProgressChanged(GetCurrentWaveProgress());
             }
-            await Task.Delay((int)(waveData.SpawnInterval * 1000));
+
+            yield return new WaitForSeconds(waveData.SpawnInterval);
+
+            if (InGameManager.Instance.IsPlaying == false) yield break;
         }
 
-        //웨이브가 끝나면 인터벌 만큼 기다렸다가 다음 웨이브 시작
-        await Task.Delay((int)(Constants.WAVE_INTERVAL * 1000));
-        _currentWaveLevel++;
-        StartWave();
+        InGameEventManager.Instance.InvokeWaveComplete(_currentWaveLevel);
+
+        yield return new WaitForSeconds(Constants.WAVE_INTERVAL);
+
+        if (InGameManager.Instance.IsPlaying == false) yield break;
+
+        StartWave(_currentWaveLevel + 1);
+    }
+
+    private IEnumerator SpawnEnemyCoroutine(int enemyId)
+    {
+        float distance = Constants.ENEMY_SPAWN_DISTANCE;
+        float randomAngleRadians = UnityEngine.Random.Range(0, 360) * Mathf.Deg2Rad;
+        Vector3 spawnPosition = InGameManager.Instance.Planet.transform.position +
+            new Vector3(Mathf.Cos(randomAngleRadians), Mathf.Sin(randomAngleRadians), 0) * distance;
+
+        var enemyTask = AddressableManager.Instance.GetEnemy(enemyId, spawnPosition, transform);
+        yield return new WaitUntil(() => enemyTask.IsCompleted);
+        var enemy = enemyTask.Result;
+        enemy.Initialize(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
+        _enemies.Add(enemy);
+    }
+
+    private int GetRandomEnemyId(WaveData waveData)
+    {
+        float randomValue = UnityEngine.Random.Range(0f, _totalSpawnRate);
+        float currentSum = 0f;
+
+        for (int k = 0; k < waveData.SpawnRates.Length; k++)
+        {
+            currentSum += waveData.SpawnRates[k];
+            if (randomValue <= currentSum)
+            {
+                return waveData.SpawnIds[k];
+            }
+        }
+
+        return waveData.SpawnIds[0];
     }
 
     public void RemoveEnemy(InGameEnemy enemy)
@@ -97,18 +132,18 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     {
         InGameEnemy closestEnemy = null;
         float closestDistanceSquared = float.MaxValue;
+        float rangeSquared = range * range;
 
-        foreach (var enemy in _enemies)
+        // 거리 기반 필터링을 먼저 수행
+        var nearbyEnemies = _enemies.Where(e => e != null &&
+            (e.transform.position - position).sqrMagnitude <= rangeSquared);
+
+        foreach (var enemy in nearbyEnemies)
         {
-            if (enemy == null) continue;
-
             Vector3 direction = enemy.transform.position - position;
             float distanceSquared = direction.sqrMagnitude;
-
-            // 적의 크기를 고려한 실제 거리 계산
             float actualDistance = Mathf.Sqrt(distanceSquared) - enemy.EnemySize;
 
-            // 실제 거리가 범위 내에 있는지 확인
             if (actualDistance <= range && actualDistance < Mathf.Sqrt(closestDistanceSquared))
             {
                 closestEnemy = enemy;
@@ -116,17 +151,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             }
         }
         return closestEnemy;
-    }
-
-    private async Task<InGameEnemy> SpawnEnemy(int enemyId)
-    {
-
-        // 적 생성, 위치는 행성에서 특정 거리만큼 떨어진 랜덤 위치
-        float distance = Constants.ENEMY_SPAWN_DISTANCE;
-        float randomAngleRadians = Random.Range(0, 360) * Mathf.Deg2Rad;
-        Vector3 spawnPosition = InGameManager.Instance.GetPlanetTransform().position +
-            new Vector3(Mathf.Cos(randomAngleRadians), Mathf.Sin(randomAngleRadians), 0) * distance;
-        return await AddressableManager.Instance.GetEnemy(enemyId, spawnPosition, transform);
     }
 
     //GIZMO로 현재 진행레벨과 진행률을 텍스트로 표시
@@ -137,6 +161,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             return;
         }
         Gizmos.color = Color.green;
-        Handles.Label(transform.position + Vector3.up, $"Wave {_currentWaveLevel} : {GetCurrentWaveProgress() * 100}%");
+        Handles.Label(transform.position + Vector3.up, $"Wave {_currentWaveLevel} : {GetCurrentWaveProgress() * 100:F1}%");
     }
 }

@@ -5,8 +5,8 @@ using Game.ObjectPool;
 
 public class InGameDamage : PoolableObject
 {
-    private const float MOVE_DURATION = 0.5f;
-    private const float MOVE_Y = 0.3f;
+    private const float MOVE_DURATION = 0.4f;
+    private const float MOVE_Y = 0.2f;
 
     [SerializeField] private TextMeshPro _damageText;
 

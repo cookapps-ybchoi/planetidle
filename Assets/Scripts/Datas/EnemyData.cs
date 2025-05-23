@@ -1,12 +1,20 @@
+
+public enum EnemyType
+{
+    Normal,
+    Boss
+}
+
 public class EnemyData
 {
     public int EnemyId { get; private set; }
+    public EnemyType EnemyType { get; private set; }
     public int EnemyLevel { get; private set; }
     public double Hp { get; private set; }
     public float MoveSpeed { get; private set; }
     public float AttackRange { get; private set; }
     public double AttackPower { get; private set; }
-    public float AttackSpeed { get; private set; }
+    public float AttackDelay { get; private set; }
 
     private double _baseHp;  // 기본 Hp 값을 저장할 필드 추가
 
@@ -19,17 +27,23 @@ public class EnemyData
     /// <param name="moveSpeed">적 이동속도</param>
     /// <param name="attackRange">적 공격범위</param>
     /// <param name="attackPower">적 공격력</param>
-    /// <param name="attackSpeed">적 공격속도</param>
-    public EnemyData(int enemyId, int enemyLevel, double hp, float moveSpeed, float attackRange, double attackPower, float attackSpeed)
+    /// <param name="attackDelay">적 공격속도</param>
+    public EnemyData(int enemyId, EnemyType enemyType, int enemyLevel, double hp, float moveSpeed, float attackRange, double attackPower, float attackDelay)
     {
         EnemyId = enemyId;
+        EnemyType = enemyType;
         MoveSpeed = moveSpeed;
         AttackRange = attackRange;
         AttackPower = attackPower;
-        AttackSpeed = attackSpeed;
+        AttackDelay = attackDelay;
 
         _baseHp = hp;
         SetLevel(enemyLevel);
+    }
+
+    public EnemyData Copy()
+    {
+        return new EnemyData(EnemyId, EnemyType, EnemyLevel, Hp, MoveSpeed, AttackRange, AttackPower, AttackDelay);
     }
 
     //레벨당 체력 10% 증가

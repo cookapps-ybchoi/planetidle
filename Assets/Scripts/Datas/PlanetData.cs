@@ -115,6 +115,8 @@ public class PlanetData
             PlanetStatType.Range => Constants.PLANET_RANGE_DEFUALT,
             PlanetStatType.AttackPower => Constants.PLANET_ATTACK_POWER_DEFAULT,
             PlanetStatType.AttackSpeed => Constants.PLANET_ATTACK_SPEED_DEFAULT,
+            PlanetStatType.Hp => Constants.PLANET_HP_DEFAULT,
+            PlanetStatType.HpRecovery => Constants.PLANET_HP_RECOVERY_DEFAULT,
             _ => 0f
         };
     }

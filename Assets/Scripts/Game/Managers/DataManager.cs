@@ -78,9 +78,9 @@ public class DataManager : GameObjectSingleton<DataManager>
     {
         List<EnemyData> enemyDatas = new List<EnemyData>();
         // 적 데이터 생성 (임시)
-        enemyDatas.Add(new EnemyData(1, 1, 10, 0.6f, 0.3f, 1f, 2f));    // 기본
-        enemyDatas.Add(new EnemyData(2, 1, 8, 1.2f, 0.3f, 1f, 2f));    // 빠른 속도
-        enemyDatas.Add(new EnemyData(3, 1, 30, 0.3f, 0.3f, 1f, 2f));   // 높은 HP
+        enemyDatas.Add(new EnemyData(1, EnemyType.Normal, 1, 10, 0.6f, 0.3f, 1f, 2f));    // 기본
+        enemyDatas.Add(new EnemyData(2, EnemyType.Normal, 1, 8, 1.2f, 0.3f, 1f, 2f));    // 빠른 속도
+        enemyDatas.Add(new EnemyData(3, EnemyType.Normal, 1, 30, 0.3f, 0.3f, 1f, 2f));   // 높은 HP
         return enemyDatas;
     }
 

@@ -30,6 +30,7 @@ Shader "Custom/Rotation"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                fixed4 color : COLOR;
             };
 
             struct v2f
@@ -37,6 +38,7 @@ Shader "Custom/Rotation"
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float2 uvCenter : TEXCOORD1;
+                fixed4 color : COLOR;
             };
 
             v2f vert(appdata v)
@@ -45,6 +47,7 @@ Shader "Custom/Rotation"
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.uvCenter = v.uv * 2.0 - 1.0; // -1 ~ 1 기준 중심 좌표
+                o.color = v.color;
                 return o;
             }
 
@@ -58,7 +61,8 @@ Shader "Custom/Rotation"
                 float dist = length(i.uvCenter);
                 if (dist > 1.0) discard; // 원 바깥은 그리지 않음
 
-                return tex2D(_MainTex, uv);
+                fixed4 texColor = tex2D(_MainTex, uv);
+                return texColor * i.color; // SpriteRenderer Color tint 적용
             }
             ENDCG
         }
