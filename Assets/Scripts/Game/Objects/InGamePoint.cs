@@ -3,17 +3,17 @@ using UnityEngine;
 using DG.Tweening;
 using Game.ObjectPool;
 
-public class InGameDamage : PoolableObject
+public class InGamePoint : PoolableObject
 {
-    private const float MOVE_DURATION = 0.3f;
-    private const float MOVE_Y = 0.2f;
+    private const float MOVE_DURATION = 0.5f;
+    private const float MOVE_Y = 0.4f;
 
-    [SerializeField] private TextMeshPro _damageText;
+    [SerializeField] private TextMeshPro _pointText;
 
     public override void OnSpawn()
     {
         base.OnSpawn();
-        _damageText.alpha = 1f;
+        _pointText.alpha = 1f;
     }
 
     public override void OnDespawn()
@@ -21,9 +21,10 @@ public class InGameDamage : PoolableObject
         base.OnDespawn();
     }
 
-    public void SetDamage(double damage)
+    //포인트는 달러로 표시
+    public void SetPoint(int point)
     {
-        _damageText.text = ((int)damage).ToString();
+        _pointText.text = $"${point}";
         Show();
     }
 
@@ -33,15 +34,16 @@ public class InGameDamage : PoolableObject
     public void Show()
     {
         // 위로 올라가는 움직임 (처음엔 빠르게, 나중엔 천천히)
-        // 위로 다 올라가면 투명해지기 시작
+        // 50% 올라갔을때 투명해지기 시작
+        // 100% 올라갔을때 사라짐
         Sequence sequence = DOTween.Sequence();
-        
+
         // 이동 애니메이션
         sequence.Append(transform.DOMoveY(transform.position.y + MOVE_Y, MOVE_DURATION).SetEase(Ease.OutQuad));
-        
-        // 투명도 애니메이션 (이동이 완료된 후 시작)
-        sequence.Append(_damageText.DOFade(0f, MOVE_DURATION * 0.5f));
-        
+
+        // 투명도 애니메이션 (50% 지점에서 시작)
+        sequence.Insert(MOVE_DURATION * 0.5f, _pointText.DOFade(0f, MOVE_DURATION * 0.5f));
+
         // 완료 후 풀로 반환
         sequence.OnComplete(() =>
         {

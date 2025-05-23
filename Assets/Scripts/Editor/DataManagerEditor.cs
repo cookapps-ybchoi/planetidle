@@ -54,7 +54,6 @@ public class DataManagerEditor : Editor
             EditorGUI.indentLevel++;
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             EditorGUILayout.LabelField("적 ID", EditorStyles.boldLabel, GUILayout.Width(60));
-            EditorGUILayout.LabelField("레벨", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("체력", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("이동속도", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("공격범위", EditorStyles.boldLabel, GUILayout.Width(60));
@@ -66,7 +65,6 @@ public class DataManagerEditor : Editor
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField(enemyData.EnemyId.ToString(), GUILayout.Width(60));
-                EditorGUILayout.LabelField(enemyData.EnemyLevel.ToString(), GUILayout.Width(60));
                 EditorGUILayout.LabelField(enemyData.Hp.ToString("F1"), GUILayout.Width(60));
                 EditorGUILayout.LabelField(enemyData.MoveSpeed.ToString("F1"), GUILayout.Width(60));
                 EditorGUILayout.LabelField(enemyData.AttackRange.ToString("F1"), GUILayout.Width(60));

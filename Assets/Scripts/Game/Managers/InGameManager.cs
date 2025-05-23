@@ -121,6 +121,9 @@ public class InGameManager : GameObjectSingleton<InGameManager>
 
         InGameDamage damage = await AddressableManager.Instance.GetDamage(Vector3.zero, transform);
         damage.gameObject.SetActive(false);
+
+        InGamePoint point = await AddressableManager.Instance.GetPoint(Vector3.zero, transform);
+        point.gameObject.SetActive(false);
     }
 
     private async Task WaitForInstance<T>(T instance) where T : class

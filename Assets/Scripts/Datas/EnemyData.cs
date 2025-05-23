@@ -1,56 +1,57 @@
-
 public enum EnemyType
 {
     Normal,
     Boss
 }
 
-public class EnemyData
+public class EnemyMetaData
 {
     public int EnemyId { get; private set; }
     public EnemyType EnemyType { get; private set; }
-    public int EnemyLevel { get; private set; }
     public double Hp { get; private set; }
     public float MoveSpeed { get; private set; }
     public float AttackRange { get; private set; }
     public double AttackPower { get; private set; }
     public float AttackDelay { get; private set; }
+    public int Point { get; private set; }
+    public int PointPerLevel { get; private set; }
 
-    private double _baseHp;  // 기본 Hp 값을 저장할 필드 추가
-
-    /// <summary>
-    /// 적 데이터 생성자
-    /// </summary>
-    /// <param name="enemyId">적 아이디</param>
-    /// <param name="enemyLevel">적 레벨</param>
-    /// <param name="hp">적 체력</param>
-    /// <param name="moveSpeed">적 이동속도</param>
-    /// <param name="attackRange">적 공격범위</param>
-    /// <param name="attackPower">적 공격력</param>
-    /// <param name="attackDelay">적 공격속도</param>
-    public EnemyData(int enemyId, EnemyType enemyType, int enemyLevel, double hp, float moveSpeed, float attackRange, double attackPower, float attackDelay)
+    public EnemyMetaData(int enemyId, EnemyType enemyType, double hp, float moveSpeed, float attackRange, double attackPower, float attackDelay, int point, int pointPerLevel)
     {
         EnemyId = enemyId;
         EnemyType = enemyType;
+        Hp = hp;
         MoveSpeed = moveSpeed;
         AttackRange = attackRange;
         AttackPower = attackPower;
         AttackDelay = attackDelay;
+        Point = point;
+        PointPerLevel = pointPerLevel;
+    }
+}
 
-        _baseHp = hp;
-        SetLevel(enemyLevel);
+public class EnemyData
+{
+    public EnemyMetaData MetaData { get; private set; }
+    public int Level { get; private set; }
+    public double Hp { get; private set; }
+    public double MaxHp => MetaData.Hp * (1 + (Level - 1) * 0.1);
+    public float MoveSpeed => MetaData.MoveSpeed;
+    public float AttackRange => MetaData.AttackRange;
+    public double AttackPower => MetaData.AttackPower;
+    public float AttackDelay => MetaData.AttackDelay;
+    public int Point => MetaData.Point + (Level - 1) * MetaData.PointPerLevel;
+
+    public EnemyData(EnemyMetaData metaData, int level)
+    {
+        MetaData = metaData;
+        Level = level;
+        Hp = MaxHp;
     }
 
     public EnemyData Copy()
     {
-        return new EnemyData(EnemyId, EnemyType, EnemyLevel, Hp, MoveSpeed, AttackRange, AttackPower, AttackDelay);
-    }
-
-    //레벨당 체력 10% 증가
-    public void SetLevel(int level)
-    {
-        EnemyLevel = level;
-        Hp = _baseHp * (1 + (level - 1) * 0.1);  // 기본 Hp 값에서 시작
+        return new EnemyData(MetaData, Level);
     }
 
     public void ChangeHp(double value)

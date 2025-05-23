@@ -8,4 +8,5 @@ public class PrefabAddressConfig : ScriptableObject
     public string InGameBullet = "InGame/Bullet";
     public string InGameExplosion = "InGame/FX_Explosion";
     public string InGameDamage = "InGame/Damage";
+    public string InGamePoint = "InGame/Point";
 }

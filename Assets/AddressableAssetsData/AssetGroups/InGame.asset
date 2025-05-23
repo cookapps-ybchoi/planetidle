@@ -45,6 +45,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - InGame
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a83f5f935bd72f349bfae88e01f2b76a
+    m_Address: InGame/Point
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - InGame
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b8b26085bc4076544ab9171c255b4f04
     m_Address: InGame/Planet_001
     m_ReadOnly: 0

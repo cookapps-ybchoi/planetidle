@@ -65,6 +65,11 @@ public class AddressableManager : GameObjectSingleton<AddressableManager>
         return await GetGameObject<InGameDamage>(prefabConfig.InGameDamage, position, parent);
     }
 
+    public async Task<InGamePoint> GetPoint(Vector3 position = default, Transform parent = null)
+    {
+        return await GetGameObject<InGamePoint>(prefabConfig.InGamePoint, position, parent);
+    }
+
     /// <summary>
     /// 오브젝트를 풀로 반환합니다.
     /// </summary>

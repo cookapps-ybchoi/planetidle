@@ -2,15 +2,50 @@ public enum PlanetStatType
 {
     Level,
     AttackPower,
+    AttackCooltime,
     AttackSpeed,
     Range,
     Hp,
     HpRecovery
 }
 
-public class PlanetData
+public class PlanetMetaData
 {
     public int PlanetId { get; private set; }
+    public double AttackPower { get; private set; }
+    public double AttackPowerPerLevel { get; private set; }
+    public double AttackCooltime { get; private set; }
+    public double AttackSpeed { get; private set; }
+    public double AttackSpeedIncreaseRatePerLevel { get; private set; }
+    public double Range { get; private set; }
+    public double RangePerLevel { get; private set; }
+    public double Hp { get; private set; }
+    public double HpPerLevel { get; private set; }
+    public double HpRecovery { get; private set; }
+    public double HpRecoveryPerLevel { get; private set; }
+
+    public PlanetMetaData(int planetId, double attackPower, double attackPowerPerLevel, double attackCooltime, double attackSpeed, double attackSpeedIncreaseRatePerLevel, double range, double rangePerLevel, double hp, double hpPerLevel, double hpRecovery, double hpRecoveryPerLevel)
+    {
+        PlanetId = planetId;
+        AttackPower = attackPower;
+        AttackPowerPerLevel = attackPowerPerLevel;
+        AttackCooltime = attackCooltime;
+        AttackSpeed = attackSpeed;
+        AttackSpeedIncreaseRatePerLevel = attackSpeedIncreaseRatePerLevel;
+        Range = range;
+        RangePerLevel = rangePerLevel;
+        Hp = hp;
+        HpPerLevel = hpPerLevel;
+        HpRecovery = hpRecovery;
+        HpRecoveryPerLevel = hpRecoveryPerLevel;
+    }
+}
+
+public class PlanetData
+{
+    public PlanetMetaData MetaData { get; private set; }
+
+    public int PlanetId { get => MetaData.PlanetId; }
     public int PlanetLevel { get; private set; }
     public int AttackPowerLevel { get; private set; }
     public int AttackSpeedLevel { get; private set; }
@@ -18,27 +53,15 @@ public class PlanetData
     public int HpLevel { get; private set; }
     public int HpRecoveryLevel { get; private set; }
 
-    public PlanetData(int planetId = 1, int planetLevel = 0, int attackPowerLevel = 0,
-        int attackSpeedLevel = 0, int rangeLevel = 0, int hpLevel = 0, int hpRecoveryLevel = 0)
+    public PlanetData(PlanetMetaData metaData)
     {
-        PlanetId = planetId;
-        PlanetLevel = planetLevel;
-        AttackPowerLevel = attackPowerLevel;
-        AttackSpeedLevel = attackSpeedLevel;
-        RangeLevel = rangeLevel;
-        HpLevel = hpLevel;
-        HpRecoveryLevel = hpRecoveryLevel;
-    }
-
-    public void SetData(PlanetData data)
-    {
-        PlanetId = data.PlanetId;
-        PlanetLevel = data.PlanetLevel;
-        AttackPowerLevel = data.AttackPowerLevel;
-        AttackSpeedLevel = data.AttackSpeedLevel;
-        RangeLevel = data.RangeLevel;
-        HpLevel = data.HpLevel;
-        HpRecoveryLevel = data.HpRecoveryLevel;
+        MetaData = metaData;
+        PlanetLevel = 0;
+        AttackPowerLevel = 0;
+        AttackSpeedLevel = 0;
+        RangeLevel = 0;
+        HpLevel = 0;
+        HpRecoveryLevel = 0;
     }
 
     public void IncreaseLevel(PlanetStatType statType)
@@ -66,17 +89,12 @@ public class PlanetData
         }
     }
 
-    public void SetPlanetId(int planetId)
-    {
-        PlanetId = planetId;
-    }
-
-    public float GetStatValue(PlanetStatType statType)
+    public double GetStatValue(PlanetStatType statType)
     {
         return GetStatDefault(statType) + GetStatLevel(statType) * GetStatMultiplier(statType);
     }
 
-    public float GetNextLevelStatValue(PlanetStatType statType)
+    public double GetNextLevelStatValue(PlanetStatType statType)
     {
         return GetStatDefault(statType) + (GetStatLevel(statType) + 1) * GetStatMultiplier(statType);
     }
@@ -95,29 +113,30 @@ public class PlanetData
         };
     }
 
-    private float GetStatMultiplier(PlanetStatType statType)
+    private double GetStatDefault(PlanetStatType statType)
     {
         return statType switch
         {
-            PlanetStatType.AttackPower => Constants.PLANET_ATTACK_POWER_PER_LEVEL,
-            PlanetStatType.AttackSpeed => Constants.PLANET_ATTACK_SPEED_PER_LEVEL,
-            PlanetStatType.Range => Constants.PLANET_RANGE_PER_LEVEL,
-            PlanetStatType.Hp => Constants.PLANET_HP_PER_LEVEL,
-            PlanetStatType.HpRecovery => Constants.PLANET_HP_RECOVERY_PER_LEVEL,
-            _ => 1f
+            PlanetStatType.Range => MetaData.Range,
+            PlanetStatType.AttackPower => MetaData.AttackPower,
+            PlanetStatType.AttackCooltime => MetaData.AttackCooltime,
+            PlanetStatType.AttackSpeed => MetaData.AttackSpeed,
+            PlanetStatType.Hp => MetaData.Hp,
+            PlanetStatType.HpRecovery => MetaData.HpRecovery,
+            _ => 0f
         };
     }
 
-    private float GetStatDefault(PlanetStatType statType)
+    private double GetStatMultiplier(PlanetStatType statType)
     {
         return statType switch
         {
-            PlanetStatType.Range => Constants.PLANET_RANGE_DEFUALT,
-            PlanetStatType.AttackPower => Constants.PLANET_ATTACK_POWER_DEFAULT,
-            PlanetStatType.AttackSpeed => Constants.PLANET_ATTACK_SPEED_DEFAULT,
-            PlanetStatType.Hp => Constants.PLANET_HP_DEFAULT,
-            PlanetStatType.HpRecovery => Constants.PLANET_HP_RECOVERY_DEFAULT,
-            _ => 0f
+            PlanetStatType.Range => MetaData.RangePerLevel,
+            PlanetStatType.AttackPower => MetaData.AttackPowerPerLevel,
+            PlanetStatType.AttackSpeed => MetaData.AttackSpeedIncreaseRatePerLevel,
+            PlanetStatType.Hp => MetaData.HpPerLevel,
+            PlanetStatType.HpRecovery => MetaData.HpRecoveryPerLevel,
+            _ => 0
         };
     }
 }

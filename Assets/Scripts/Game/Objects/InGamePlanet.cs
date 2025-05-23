@@ -17,9 +17,9 @@ public class InGamePlanet : PoolableObject
     private bool _canAttack = true;
     private bool _isPlayingHitEffect = false;
     private double _hp;
-    private float _cachedRange;
-    private float _cachedAttackSpeed;
-    private float _attackCooldownTime;
+    private double _cachedRange;
+    private double _cachedAttackSpeed;
+    private double _attackCooldownTime;
     private Coroutine _attackRoutine;
 
     public override void OnSpawn()
@@ -33,7 +33,7 @@ public class InGamePlanet : PoolableObject
         // 캐시된 값 초기화
         _cachedRange = _planetData.GetStatValue(PlanetStatType.Range);
         _cachedAttackSpeed = _planetData.GetStatValue(PlanetStatType.AttackSpeed);
-        _attackCooldownTime = Constants.PLANET_ATTACK_DELAY_DEFUALT / _cachedAttackSpeed;
+        _attackCooldownTime = _planetData.GetStatValue(PlanetStatType.AttackCooltime) / _cachedAttackSpeed;
 
         // 초기화 시 범위 표시 업데이트
         DrawRange();
@@ -122,17 +122,17 @@ public class InGamePlanet : PoolableObject
     {
         _canAttack = false;
         yield return StartCoroutine(Attack(enemy));
-        yield return new WaitForSeconds(_attackCooldownTime);
+        yield return new WaitForSeconds((float)_attackCooldownTime);
         _canAttack = true;
     }
 
     private void DrawRange()
     {
-        float range = _cachedRange * 2f;
-        _rangeSprite.transform.localScale = new Vector3(range, range, 1);
+        double range = _cachedRange * 2f;
+        _rangeSprite.transform.localScale = new Vector3((float)range, (float)range, 1);
 
         //기본 두께는 0.03 기준 range 1. range 증가 값에 역비례
-        _rangeSprite.material.SetFloat("_Thickness", RANGE_THICKNESS_DEFAULT / range);
+        _rangeSprite.material.SetFloat("_Thickness", RANGE_THICKNESS_DEFAULT / (float)range);
     }
 
     private IEnumerator PlayHitEffectCoroutine(SpriteRenderer spriteRenderer)
@@ -140,31 +140,15 @@ public class InGamePlanet : PoolableObject
         _isPlayingHitEffect = true;
 
         Color originalColor = _planetSprite.color;
-        Color hitColor = Color.red;
-        float duration = 0.2f; // 전체 이펙트 지속시간
-        float halfDuration = duration * 0.5f;
+        Color hitColor = new Color(1f, 0.5f, 0.5f); // 연한 빨간색
+        float duration = 0.025f; // 전체 이펙트 지속시간
 
-        // 빨간색으로 페이드
-        float elapsed = 0f;
-        while (elapsed < halfDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / halfDuration;
-            spriteRenderer.color = Color.Lerp(originalColor, hitColor, t);
-            yield return null;
-        }
+        // 빨간색으로 변경
+        spriteRenderer.color = hitColor;
+        yield return new WaitForSeconds(duration);
 
-        // 원래 색으로 페이드백
-        elapsed = 0f;
-        while (elapsed < halfDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / halfDuration;
-            spriteRenderer.color = Color.Lerp(hitColor, originalColor, t);
-            yield return null;
-        }
-
-        spriteRenderer.color = originalColor; // 원래 색으로 확실히 복원
+        // 원래 색으로 복원
+        spriteRenderer.color = originalColor;
         _isPlayingHitEffect = false;
     }
 

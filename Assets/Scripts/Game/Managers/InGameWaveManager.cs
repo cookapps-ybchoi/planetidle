@@ -102,7 +102,8 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         var enemyTask = AddressableManager.Instance.GetEnemy(enemyId, spawnPosition, transform);
         yield return new WaitUntil(() => enemyTask.IsCompleted);
         var enemy = enemyTask.Result;
-        enemy.Initialize(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
+        EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
+        enemy.Initialize(enemyData);
         _enemies.Add(enemy);
     }
 
@@ -128,11 +129,11 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         _enemies.Remove(enemy);
     }
 
-    public InGameEnemy GetTargetEnemy(Vector3 position, float range)
+    public InGameEnemy GetTargetEnemy(Vector3 position, double range)
     {
         InGameEnemy closestEnemy = null;
         float closestDistanceSquared = float.MaxValue;
-        float rangeSquared = range * range;
+        double rangeSquared = range * range;
 
         // 거리 기반 필터링을 먼저 수행
         var nearbyEnemies = _enemies.Where(e => e != null &&

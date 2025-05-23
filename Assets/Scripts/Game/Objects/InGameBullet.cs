@@ -51,7 +51,6 @@ public class InGameBullet : PoolableObject
                 else if (Vector3.Distance(transform.position, _target.transform.position) <= 0.1f)
                 {
                     double damage = InGameManager.Instance.GetPlanetAttackPower();
-                    ShowDamage(damage);
                     _target.TakeDamage(damage);
                     _currentState = BulletState.Destroy;
                 }
@@ -69,12 +68,6 @@ public class InGameBullet : PoolableObject
     private void MoveToTarget()
     {
         transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, Constants.PLANET_BULLET_SPEED * Time.deltaTime);
-    }
-
-    private async void ShowDamage(double damage)
-    {
-        InGameDamage damageObject = await AddressableManager.Instance.GetDamage(transform.position, transform.parent);
-        damageObject.SetDamage(damage);
     }
 
     private void Finish()

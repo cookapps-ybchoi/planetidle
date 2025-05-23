@@ -42,10 +42,9 @@ public class InGameEnemy : PoolableObject
         OnEnemyDestroyed = null;
     }
 
-    public void Initialize(EnemyData enemyData, int waveLevel)
+    public void Initialize(EnemyData enemyData)
     {
         _enemyData = enemyData.Copy();
-        _enemyData.SetLevel(waveLevel);
         _currentState = EnemyState.Moving;
     }
 
@@ -53,9 +52,10 @@ public class InGameEnemy : PoolableObject
     {
         if (_enemyData == null) return false;
         else if (_currentState == EnemyState.Destroy || _currentState == EnemyState.Finish) return false;
-        return _enemyData.Hp > 0;
+        return _enemyData.MaxHp > 0;
     }
 
+    // 데미지 처리
     public void TakeDamage(double damage)
     {
         //상태가 Destroy 또는 Finish 일 때 스킵
@@ -70,7 +70,7 @@ public class InGameEnemy : PoolableObject
         {
             if (!_isPlayingHitEffect)
             {
-                StartCoroutine(PlayHitEffectCoroutine(_spriteRenderer));
+                StartCoroutine(PlayHitEffectCoroutine(damage));
             }
         }
 
@@ -125,6 +125,12 @@ public class InGameEnemy : PoolableObject
     {
         var explosionTask = AddressableManager.Instance.GetExplosion(_explosionId, transform.position, transform.parent);
         yield return new WaitUntil(() => explosionTask.IsCompleted);
+
+        var pointTask = AddressableManager.Instance.GetPoint(transform.position, transform.parent);
+        yield return new WaitUntil(() => pointTask.IsCompleted);
+        InGamePoint pointObject = pointTask.Result;
+        pointObject.SetPoint(_enemyData.Point);
+
         InGameWaveManager.Instance.RemoveEnemy(this);
         AddressableManager.Instance.ReturnToPool(this);
     }
@@ -156,36 +162,26 @@ public class InGameEnemy : PoolableObject
         _canAttack = true;
     }
 
-    private IEnumerator PlayHitEffectCoroutine(SpriteRenderer spriteRenderer)
+    // 데미지 효과 재생(빨간색으로 페이드, 데미지 표시)
+    private IEnumerator PlayHitEffectCoroutine(double damage)
     {
+        var damageTask = AddressableManager.Instance.GetDamage(transform.position, transform.parent);
+        yield return new WaitUntil(() => damageTask.IsCompleted);
+        InGameDamage damageObject = damageTask.Result;
+        damageObject.SetDamage(damage);
+
         _isPlayingHitEffect = true;
 
-        Color originalColor = spriteRenderer.color;
-        Color hitColor = Color.red;
-        float duration = 0.2f; // 전체 이펙트 지속시간
-        float halfDuration = duration * 0.5f;
+        Color originalColor = _spriteRenderer.color;
+        Color hitColor = new Color(1f, 0.5f, 0.5f); // 연한 빨간색
+        float duration = 0.05f; // 전체 이펙트 지속시간
 
-        // 빨간색으로 페이드
-        float elapsed = 0f;
-        while (elapsed < halfDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / halfDuration;
-            spriteRenderer.color = Color.Lerp(originalColor, hitColor, t);
-            yield return null;
-        }
+        // 빨간색으로 변경
+        _spriteRenderer.color = hitColor;
+        yield return new WaitForSeconds(duration);
 
-        // 원래 색으로 페이드백
-        elapsed = 0f;
-        while (elapsed < halfDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / halfDuration;
-            spriteRenderer.color = Color.Lerp(hitColor, originalColor, t);
-            yield return null;
-        }
-
-        spriteRenderer.color = originalColor; // 원래 색으로 확실히 복원
+        // 원래 색으로 복원
+        _spriteRenderer.color = originalColor;
         _isPlayingHitEffect = false;
     }
 
