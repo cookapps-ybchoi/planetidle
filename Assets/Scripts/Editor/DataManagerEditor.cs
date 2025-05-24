@@ -30,19 +30,16 @@ public class DataManagerEditor : Editor
             EditorGUILayout.LabelField("행성 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
             EditorGUILayout.LabelField("공격력 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
             EditorGUILayout.LabelField("공격속도 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("사정거리 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
             EditorGUILayout.LabelField("체력 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
             EditorGUILayout.LabelField("체력회복 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(planetData.PlanetId.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.PlanetLevel.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.AttackPowerLevel.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.AttackSpeedLevel.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.RangeLevel.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.HpLevel.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.HpRecoveryLevel.ToString(), GUILayout.Width(80));
+            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.AttackPower).ToString(), GUILayout.Width(80));
+            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.AttackSpeed).ToString(), GUILayout.Width(80));
+            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.Hp).ToString(), GUILayout.Width(80));
+            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.HpRecovery).ToString(), GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
             EditorGUI.indentLevel--;
         }
@@ -92,18 +89,15 @@ public class DataManagerEditor : Editor
 
             foreach (var waveData in dataManager.WaveDataList)
             {
-                for (int i = 0; i < waveData.SpawnIds.Length; i++)
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField(waveData.WaveId.ToString(), GUILayout.Width(60));
-                    EditorGUILayout.LabelField(waveData.WaveLevel.ToString(), GUILayout.Width(60));
-                    EditorGUILayout.LabelField(waveData.SpawnCount.ToString(), GUILayout.Width(60));
-                    EditorGUILayout.LabelField(waveData.BatchCount.ToString(), GUILayout.Width(60));
-                    EditorGUILayout.LabelField(waveData.SpawnInterval.ToString("F1"), GUILayout.Width(60));
-                    EditorGUILayout.LabelField(waveData.SpawnIds[i].ToString(), GUILayout.Width(60));
-                    EditorGUILayout.LabelField($"{waveData.SpawnRates[i] * 100:F1}%", GUILayout.Width(60));
-                    EditorGUILayout.EndHorizontal();
-                }
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(waveData.WaveId.ToString(), GUILayout.Width(60));
+                EditorGUILayout.LabelField(waveData.WaveLevel.ToString(), GUILayout.Width(60));
+                EditorGUILayout.LabelField(waveData.SpawnCount.ToString(), GUILayout.Width(60));
+                EditorGUILayout.LabelField(waveData.BatchCount.ToString(), GUILayout.Width(60));
+                EditorGUILayout.LabelField(waveData.SpawnInterval.ToString("F1"), GUILayout.Width(60));
+                EditorGUILayout.LabelField(waveData.SpawnId.ToString(), GUILayout.Width(60));
+                EditorGUILayout.LabelField($"{waveData.SpawnRate * 100:F1}%", GUILayout.Width(60));
+                EditorGUILayout.EndHorizontal();
             }
             EditorGUI.indentLevel--;
         }

@@ -2,17 +2,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Linq;
-using UnityEditor;
-using System;
 using System.Collections;
+using UnityEngine.Pool;
 
 public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 {
-    private List<InGameEnemy> _enemies = new List<InGameEnemy>();
-    private WaveData _waveData = null;
+    private List<InGameEnemy> _enemies = new();
     private int _currentWaveLevel = 1;
     private int _currentSpawnCount = 0;
-    private float _totalSpawnRate = 0f;
+    private int _totalSpawnCount = 0;
 
     public async Task Initialize()
     {
@@ -20,14 +18,16 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         await Task.CompletedTask;
     }
 
+    public int CurrentWave => _currentWaveLevel;
+
     //현재 웨이브의 진행률 리턴
     public float GetCurrentWaveProgress()
     {
-        if (_waveData == null)
+        if (_totalSpawnCount <= 0)
         {
             return 0f;
         }
-        return (float)_currentSpawnCount / (float)_waveData.TotalSpawnCount;
+        return (float)_currentSpawnCount / (float)_totalSpawnCount;
     }
 
     //웨이브 시작
@@ -37,24 +37,20 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         if (InGameManager.Instance.IsPlaying)
         {
             _currentWaveLevel = waveLevel;
-            _waveData = DataManager.Instance.WaveDataList.Find(data => data.WaveLevel == _currentWaveLevel);
-            if (_waveData == null)
+            List<WaveMetaData> waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
+            if (waveDatas.Count == 0)
             {
                 //웨이브 데이터가 없으면 가장 마지막 웨이브 반복
-                _waveData = DataManager.Instance.WaveDataList.Last();
+                var lastWaveLevel = DataManager.Instance.WaveDataList.Max(data => data.WaveLevel);
+                waveDatas.AddRange(DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == lastWaveLevel));
             }
-
-            // SpawnRates 합산 미리 계산
-            _totalSpawnRate = _waveData.SpawnRates.Sum();
-
             InGameEventManager.Instance.InvokeWaveStart(_currentWaveLevel);
-            StartCoroutine(SpawnEnemies(_waveData));
+            StartCoroutine(SpawnEnemies(waveDatas));
         }
     }
 
     public void StopWave()
     {
-        _waveData = null;
         //전체 적 제거
         foreach (var enemy in _enemies)
         {
@@ -63,22 +59,29 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         _enemies.Clear();
     }
 
-    private IEnumerator SpawnEnemies(WaveData waveData)
+    private IEnumerator SpawnEnemies(List<WaveMetaData> waveDatas)
     {
         _currentSpawnCount = 0;
+        _totalSpawnCount = waveDatas.First().TotalSpawnCount;
+        int spawnCount = waveDatas.First().SpawnCount;
+        int batchCount = waveDatas.First().BatchCount;
+        float spawnInterval = waveDatas.First().SpawnInterval;
 
-        for (int i = 0; i < waveData.SpawnCount; i++)
+        for (int i = 0; i < spawnCount; i++)
         {
-            for (int j = 0; j < waveData.BatchCount; j++)
+            for (int j = 0; j < batchCount; j++)
             {
-                int randomEnemyId = GetRandomEnemyId(waveData);
-                StartCoroutine(SpawnEnemyCoroutine(randomEnemyId));
-                _currentSpawnCount++;
-
-                InGameEventManager.Instance.InvokeWaveProgressChanged(GetCurrentWaveProgress());
+                WaveMetaData selectedWaveData = GetRandomWaveData(waveDatas);
+                if (selectedWaveData != null)
+                {
+                    int randomEnemyId = selectedWaveData.SpawnId;
+                    StartCoroutine(SpawnEnemyCoroutine(randomEnemyId));
+                    _currentSpawnCount++;
+                    InGameEventManager.Instance.InvokeWaveProgressChanged(GetCurrentWaveProgress());
+                }
             }
 
-            yield return new WaitForSeconds(waveData.SpawnInterval);
+            yield return new WaitForSeconds(spawnInterval);
 
             if (InGameManager.Instance.IsPlaying == false) yield break;
         }
@@ -107,21 +110,22 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         _enemies.Add(enemy);
     }
 
-    private int GetRandomEnemyId(WaveData waveData)
+    private WaveMetaData GetRandomWaveData(List<WaveMetaData> waveDatas)
     {
-        float randomValue = UnityEngine.Random.Range(0f, _totalSpawnRate);
+        float totalRate = waveDatas.Sum(data => data.SpawnRate);
+        float randomValue = UnityEngine.Random.Range(0f, totalRate);
         float currentSum = 0f;
 
-        for (int k = 0; k < waveData.SpawnRates.Length; k++)
+        foreach (var waveData in waveDatas)
         {
-            currentSum += waveData.SpawnRates[k];
+            currentSum += waveData.SpawnRate;
             if (randomValue <= currentSum)
             {
-                return waveData.SpawnIds[k];
+                return waveData;
             }
         }
 
-        return waveData.SpawnIds[0];
+        return null;
     }
 
     public void RemoveEnemy(InGameEnemy enemy)
@@ -152,16 +156,5 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             }
         }
         return closestEnemy;
-    }
-
-    //GIZMO로 현재 진행레벨과 진행률을 텍스트로 표시
-    private void OnDrawGizmos()
-    {
-        if (_waveData == null)
-        {
-            return;
-        }
-        Gizmos.color = Color.green;
-        Handles.Label(transform.position + Vector3.up, $"Wave {_currentWaveLevel} : {GetCurrentWaveProgress() * 100:F1}%");
     }
 }

@@ -14,6 +14,9 @@ public class InGameEventManager : GameObjectSingleton<InGameEventManager>
     public event Action<int> OnWaveStart;
     public event Action<float> OnWaveProgressChanged;
     public event Action<int> OnWaveComplete;
+    public event Action<int> OnPointsChanged;
+    public event Action<PlanetStatType, int> OnPlanetStateLevelChanged;
+    public event Action<PlanetStatType, double> OnPlanetStateValueChanged;
 
     public async Task Initialize()
     {
@@ -24,4 +27,7 @@ public class InGameEventManager : GameObjectSingleton<InGameEventManager>
     public void InvokeWaveStart(int waveLevel) => OnWaveStart?.Invoke(waveLevel);
     public void InvokeWaveProgressChanged(float progress) => OnWaveProgressChanged?.Invoke(progress);
     public void InvokeWaveComplete(int waveLevel) => OnWaveComplete?.Invoke(waveLevel);
+    public void InvokePointsChanged(int points) => OnPointsChanged?.Invoke(points);
+    public void InvokePlanetStateLevelChanged(PlanetStatType statType, int level) => OnPlanetStateLevelChanged?.Invoke(statType, level);
+    public void InvokePlanetStateValueChanged(PlanetStatType statType, double value) => OnPlanetStateValueChanged?.Invoke(statType, value);
 }

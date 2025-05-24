@@ -10,12 +10,12 @@ public class Constants
     public const float PLANET_ATTACK_POWER_DEFAULT = 10f;
     public const float PLANET_ATTACK_POWER_PER_LEVEL = 2f;
 
-    public const float PLANET_ATTACK_COOLTIME_DEFUALT = 0.6f;
+    public const float PLANET_ATTACK_COOLTIME_DEFUALT = 0.5f;
     public const float PLANET_ATTACK_SPEED_DEFAULT = 1f;
     public const float PLANET_ATTACK_SPEED_INCREASE_RATE_PER_LEVEL = 0.1f;
 
-    public const float PLANET_HP_DEFAULT = 10f;
-    public const float PLANET_HP_PER_LEVEL = 5f;
+    public const float PLANET_HP_DEFAULT = 50f;
+    public const float PLANET_HP_PER_LEVEL = 10f;
 
     public const float PLANET_HP_RECOVERY_DEFAULT = 0f;
     public const float PLANET_HP_RECOVERY_PER_LEVEL = 0.2f;

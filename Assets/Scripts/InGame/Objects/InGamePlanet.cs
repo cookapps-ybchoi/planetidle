@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using Game.ObjectPool;
-using System.Threading.Tasks;
+using System;
 
 public class InGamePlanet : PoolableObject
 {
@@ -17,48 +17,61 @@ public class InGamePlanet : PoolableObject
     private bool _canAttack = true;
     private bool _isPlayingHitEffect = false;
     private double _hp;
-    private double _cachedRange;
-    private double _cachedAttackSpeed;
+    private double _maxHp;
+    private double _hpRecovery;
+    private double _range;
+    private double _attackSpeed;
     private double _attackCooldownTime;
-    private Coroutine _attackRoutine;
+    private Coroutine _gameRoutine;
+
+    public double CurrrentHp => _hp;
 
     public override void OnSpawn()
     {
         base.OnSpawn();
+
+        // 이벤트 구독
+        InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateChanged;
+
         // 행성 데이터
         _planetData = DataManager.Instance.PlanetData;
-        _hp = _planetData.GetStatValue(PlanetStatType.Hp);
+        _planetData.Initialize();
+
+        // 행성 스프라이트 색상 초기화
         _planetSprite.color = Color.white;
 
         // 캐시된 값 초기화
-        _cachedRange = _planetData.GetStatValue(PlanetStatType.Range);
-        _cachedAttackSpeed = _planetData.GetStatValue(PlanetStatType.AttackSpeed);
-        _attackCooldownTime = _planetData.GetStatValue(PlanetStatType.AttackCooltime) / _cachedAttackSpeed;
+        ResetValues();
+
+        // 값 초기화
+        UpdateValues();
 
         // 초기화 시 범위 표시 업데이트
         DrawRange();
 
-        // 공격 루틴 시작
-        if (_attackRoutine != null)
-        {
-            StopCoroutine(_attackRoutine);
-        }
-        _attackRoutine = StartCoroutine(AttackRoutine());
+        // 게임 루틴 시작
+        StartGameRoutine();
     }
 
     public override void OnDespawn()
     {
         base.OnDespawn();
-        if (_attackRoutine != null)
+
+        // 이벤트 구독 해제
+        InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateChanged;
+
+        if (_gameRoutine != null)
         {
-            StopCoroutine(_attackRoutine);
-            _attackRoutine = null;
+            StopCoroutine(_gameRoutine);
+            _gameRoutine = null;
         }
     }
 
     public void TakeDamage(double damage)
     {
         _hp -= damage;
+        InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
+        Debug.Log($"TakeDamage: {damage}, hp: {_hp}");
         if (_hp <= 0)
         {
             InGameManager.Instance.GameOver();
@@ -71,8 +84,6 @@ public class InGamePlanet : PoolableObject
                 StartCoroutine(PlayHitEffectCoroutine(_planetSprite));
             }
         }
-
-        Debug.Log($"Planet HP: {_hp}");
     }
 
     public void Finish()
@@ -80,15 +91,70 @@ public class InGamePlanet : PoolableObject
         StartCoroutine(FinishCoroutine());
     }
 
-    private IEnumerator AttackRoutine()
+    private void OnPlanetStateChanged(PlanetStatType statType, int level)
     {
+        UpdateValues();
+        DrawRange();
+    }
+
+    private void ResetValues()
+    {
+        _range = 0;
+        _attackSpeed = 0;
+        _attackCooldownTime = 0;
+        _hp = 0;
+        _maxHp = 0;
+        _hpRecovery = 0;
+    }
+
+    private void UpdateValues()
+    {
+        _range = _planetData.GetStatValue(PlanetStatType.Range);
+        _attackSpeed = _planetData.GetStatValue(PlanetStatType.AttackSpeed);
+        _attackCooldownTime = _planetData.GetStatValue(PlanetStatType.AttackCooltime) / _attackSpeed;
+        _hpRecovery = _planetData.GetStatValue(PlanetStatType.HpRecovery);
+
+        // 최대 체력 증가 만큼만 체력 증가
+        double previousMaxHp = _maxHp;
+        _maxHp = _planetData.GetStatValue(PlanetStatType.Hp);
+        _hp += _maxHp - previousMaxHp;
+        InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
+    }
+
+    private void StartGameRoutine()
+    {
+        if (_gameRoutine != null)
+        {
+            StopCoroutine(_gameRoutine);
+        }
+        _gameRoutine = StartCoroutine(GameRoutine());
+    }
+
+    private IEnumerator GameRoutine()
+    {
+        float hpRecoveryTimer = 0f;
+
         while (true)
         {
+            // 공격 체크
             if (_canAttack)
             {
                 CheckAndAttackEnemies();
             }
-            yield return null; // 한 프레임 대기
+
+            // HP 회복 체크
+            hpRecoveryTimer += Time.deltaTime;
+            if (hpRecoveryTimer >= 1f)
+            {
+                if (_hp < _maxHp)
+                {
+                    _hp = Math.Min(_hp + _hpRecovery, _maxHp);
+                    InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
+                }
+                hpRecoveryTimer = 0f;
+            }
+
+            yield return null;
         }
     }
 
@@ -100,7 +166,7 @@ public class InGamePlanet : PoolableObject
         }
         else
         {
-            _targetEnemy = InGameWaveManager.Instance.GetTargetEnemy(transform.position, _cachedRange);
+            _targetEnemy = InGameWaveManager.Instance.GetTargetEnemy(transform.position, _range);
             if (_targetEnemy != null)
             {
                 _targetEnemy.OnEnemyDestroyed += OnTargetEnemyDestroyed;
@@ -128,7 +194,7 @@ public class InGamePlanet : PoolableObject
 
     private void DrawRange()
     {
-        double range = _cachedRange * 2f;
+        double range = _range * 2f;
         _rangeSprite.transform.localScale = new Vector3((float)range, (float)range, 1);
 
         //기본 두께는 0.03 기준 range 1. range 증가 값에 역비례

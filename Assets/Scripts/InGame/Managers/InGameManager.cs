@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Game.ObjectPool;
 using System.Collections;
 
-public class InGameManager : GameObjectSingleton<InGameManager>
+public partial class InGameManager : GameObjectSingleton<InGameManager>
 {
     private InGamePlanet _planet;
 
@@ -57,20 +57,6 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         StartCoroutine(CreatePlanetAndStartGame());
     }
 
-    private IEnumerator CreatePlanetAndStartGame()
-    {
-        // 행성 생성 대기
-        var task = AddressableManager.Instance.GetPlanet(DataManager.Instance.PlanetData.PlanetId, Vector3.zero, transform);
-        yield return new WaitUntil(() => task.IsCompleted);
-        _planet = task.Result;
-
-        // 행성이 생성되면 게임 시작
-        _currentState = InGameState.GamePlay;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
-
-        InGameWaveManager.Instance.StartWave();
-    }
-
     public void PauseGame()
     {
         if (_currentState != InGameState.GamePlay) return;
@@ -103,9 +89,48 @@ public class InGameManager : GameObjectSingleton<InGameManager>
         Debug.Log("GameOver");
     }
 
-    public double GetPlanetAttackPower()
+    public double GetPlanetStateValue(PlanetStatType statType)
     {
-        return DataManager.Instance.PlanetData.GetStatValue(PlanetStatType.AttackPower);
+        return DataManager.Instance.PlanetData.GetStatValue(statType);
+    }
+
+    public double GetPlanetNextLevelStateValue(PlanetStatType statType)
+    {
+        return DataManager.Instance.PlanetData.GetNextLevelStatValue(statType);
+    }
+
+    public int GetPlanetStateLevel(PlanetStatType statType)
+    {
+        return DataManager.Instance.PlanetData.GetStatLevel(statType);
+    }
+
+    public void IncreasePlanetStateLevel(PlanetStatType statType)
+    {
+        int level = DataManager.Instance.PlanetData.IncreaseStateLevel(statType);
+        InGameEventManager.Instance.InvokePlanetStateLevelChanged(statType, level);
+    }
+
+    public double GetCurrentPlanetHp()
+    {
+        return _planet.CurrrentHp;
+    }
+
+    private IEnumerator CreatePlanetAndStartGame()
+    {
+        // 행성 생성 대기
+        var task = AddressableManager.Instance.GetPlanet(DataManager.Instance.PlanetData.PlanetId, Vector3.zero, transform);
+        yield return new WaitUntil(() => task.IsCompleted);
+        _planet = task.Result;
+
+        // 포인트 초기화
+        _currentPoints = 0;
+        InGameEventManager.Instance.InvokePointsChanged(_currentPoints);
+
+        // 행성이 생성되면 게임 시작
+        _currentState = InGameState.GamePlay;
+        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+
+        InGameWaveManager.Instance.StartWave();
     }
 
     private async Task Preload()

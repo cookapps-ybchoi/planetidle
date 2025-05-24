@@ -131,6 +131,9 @@ public class InGameEnemy : PoolableObject
         InGamePoint pointObject = pointTask.Result;
         pointObject.SetPoint(_enemyData.Point);
 
+        // 포인트 추가
+        InGameManager.Instance.AddPoints(_enemyData.Point);
+
         InGameWaveManager.Instance.RemoveEnemy(this);
         AddressableManager.Instance.ReturnToPool(this);
     }
@@ -156,6 +159,7 @@ public class InGameEnemy : PoolableObject
     // 행성에 공격 딜레이 대기 후 지속 공격
     private IEnumerator AttackPlanetCoutine()
     {
+        _canAttack = false;
         yield return new WaitForSeconds(_enemyData.AttackDelay);
         if (IsAlive())
             InGameManager.Instance.Planet.TakeDamage(_enemyData.AttackPower);

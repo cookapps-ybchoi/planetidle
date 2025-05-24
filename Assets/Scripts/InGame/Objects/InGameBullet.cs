@@ -50,7 +50,7 @@ public class InGameBullet : PoolableObject
                 }
                 else if (Vector3.Distance(transform.position, _target.transform.position) <= 0.1f)
                 {
-                    double damage = InGameManager.Instance.GetPlanetAttackPower();
+                    double damage = InGameManager.Instance.GetPlanetStateValue(PlanetStatType.AttackPower);
                     _target.TakeDamage(damage);
                     _currentState = BulletState.Destroy;
                 }
