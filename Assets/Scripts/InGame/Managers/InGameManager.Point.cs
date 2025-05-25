@@ -9,7 +9,7 @@ public partial class InGameManager
     public void AddPoints(int points)
     {
         _currentPoints += points;
-        InGameEventManager.Instance.InvokePointsChanged(_currentPoints);
+        InGameEventManager.Instance.InvokePointsChanged(points, _currentPoints);
     }
 
     public bool TrySpendPoints(int points)
@@ -17,7 +17,7 @@ public partial class InGameManager
         if (_currentPoints < points) return false;
         
         _currentPoints -= points;
-        InGameEventManager.Instance.InvokePointsChanged(_currentPoints);
+        InGameEventManager.Instance.InvokePointsChanged(-points, _currentPoints);
         return true;
     }
 } 

@@ -8,6 +8,70 @@ public class InGameManagerEditor : Editor
     private readonly Color disabledButtonColor = new Color(0.5f, 0.5f, 0.5f);
     private readonly int maxLevel = 100; // 최대 레벨 설정
 
+    private void OnEnable()
+    {
+        // 에디터가 활성화될 때 이벤트 구독
+        if (InGameEventManager.Instance != null)
+        {
+            InGameEventManager.Instance.OnGameStateChanged += OnGameStateChanged;
+            InGameEventManager.Instance.OnPointsChanged += OnPointsChanged;
+            InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateLevelChanged;
+            InGameEventManager.Instance.OnWaveComplete += OnWaveComplete;
+            InGameEventManager.Instance.OnWaveWaitProgressChanged += OnWaveWaitProgressChanged;
+            InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
+        }
+    }
+
+    private void OnDisable()
+    {
+        // 에디터가 비활성화될 때 이벤트 구독 해제
+        if (InGameEventManager.Instance != null)
+        {
+            InGameEventManager.Instance.OnGameStateChanged -= OnGameStateChanged;
+            InGameEventManager.Instance.OnPointsChanged -= OnPointsChanged;
+            InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateLevelChanged;
+            InGameEventManager.Instance.OnWaveComplete -= OnWaveComplete;
+            InGameEventManager.Instance.OnWaveWaitProgressChanged -= OnWaveWaitProgressChanged;
+            InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
+        }
+    }
+
+    private void OnGameStateChanged(InGameState state)
+    {
+        // 게임 상태가 변경될 때마다 에디터 UI 갱신
+        Repaint();
+    }
+
+    private void OnPointsChanged(int points, int totalPoints)
+    {
+        // 포인트가 변경될 때마다 에디터 UI 갱신
+        Repaint();
+    }
+
+    private void OnPlanetStateLevelChanged(PlanetStatType statType, int level)
+    {
+        // 행성 상태 레벨이 변경될 때마다 에디터 UI 갱신
+        Repaint();
+    }
+
+    private void OnWaveComplete(int waveLevel)
+    {
+        // 웨이브가 완료될 때마다 에디터 UI 갱신
+        Repaint();
+    }
+
+    private void OnWaveWaitProgressChanged(float progress)
+    {
+        // 웨이브 대기 진행률이 변경될 때마다 에디터 UI 갱신
+        Repaint();
+    }
+
+    private void OnEnemyDestroyed(int enemyId)
+    {
+        // 적이 처치될 때마다 에디터 UI 갱신
+        Repaint();
+    }
+
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -34,7 +98,13 @@ public class InGameManagerEditor : Editor
             EditorGUILayout.Space(10);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("현재 포인트", inGameManager.CurrentPoints.ToString(), EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("현재 체력", inGameManager.GetCurrentPlanetHp().ToString("F1"), EditorStyles.boldLabel);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("현재 체력", EditorStyles.boldLabel);
+            float currentHp = (float)inGameManager.GetCurrentPlanetHp();
+            float maxHp = (float)inGameManager.GetPlanetStateValue(PlanetStatType.Hp);
+            float hpRatio = currentHp / maxHp;
+            EditorGUI.ProgressBar(EditorGUILayout.GetControlRect(false, 20), hpRatio, $"{currentHp:F1}/{maxHp:F1}");
             EditorGUILayout.EndHorizontal();
 
             // 현재 웨이브 표시
@@ -44,7 +114,34 @@ public class InGameManagerEditor : Editor
             float progress = InGameWaveManager.Instance.GetCurrentWaveProgress();
             EditorGUI.ProgressBar(EditorGUILayout.GetControlRect(false, 20), progress, $"{progress:P1}");
             EditorGUILayout.EndHorizontal();
+
+            // 웨이브 대기 진행률 표시
+            EditorGUILayout.Space(10);
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("웨이브 대기 진행률", InGameWaveManager.Instance.GetCurrentWaveWaitProgress().ToString("P1"), EditorStyles.boldLabel);
+            progress = InGameWaveManager.Instance.GetCurrentWaveWaitProgress();
+            EditorGUI.ProgressBar(EditorGUILayout.GetControlRect(false, 20), progress, $"{progress:P1}");
+            EditorGUILayout.EndHorizontal();
+
+            // 적 처치 횟수, 레벨업 횟수, 포인트 획득, 포인트 소모 표시
+            EditorGUILayout.Space(10);
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("게임 통계", EditorStyles.boldLabel);
             
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField("적 처치 횟수", inGameManager.TotalEnemiesDestroyed.ToString(), EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("레벨업 횟수", inGameManager.TotalPlanetLevelUpsCount.ToString(), EditorStyles.boldLabel);
+            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.LabelField("포인트 획득", inGameManager.TotalPointsEarned.ToString(), EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("포인트 소모", inGameManager.TotalPointsSpent.ToString(), EditorStyles.boldLabel);
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.EndVertical();
+
             // 레벨업 버튼들 표시
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("스탯 레벨업", EditorStyles.boldLabel);

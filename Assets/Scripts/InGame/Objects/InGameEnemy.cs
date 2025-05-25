@@ -16,17 +16,19 @@ public class InGameEnemy : PoolableObject
     }
 
     public float EnemySize => _size;
-    public event Action<InGameEnemy> OnEnemyDestroyed;
 
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private float _size = 0.25f;
     [SerializeField] private int _explosionId = 1;
 
+    private int _enemyId;
+    private int _enemySpawnId;
     private EnemyState _currentState = EnemyState.Idle;
     private EnemyData _enemyData;
     private bool _isPlayingHitEffect = false;
     private bool _canAttack = true;
 
+    public int EnemySpawnId => _enemySpawnId;
 
     public override void OnSpawn()
     {
@@ -39,12 +41,12 @@ public class InGameEnemy : PoolableObject
     {
         base.OnDespawn();
         _enemyData = null;
-        OnEnemyDestroyed = null;
     }
 
-    public void Initialize(EnemyData enemyData)
+    public void Initialize(EnemyData enemyData, int enemySpawnId)
     {
         _enemyData = enemyData.Copy();
+        _enemySpawnId = enemySpawnId;
         _currentState = EnemyState.Moving;
     }
 
@@ -80,7 +82,7 @@ public class InGameEnemy : PoolableObject
     public void Finish()
     {
         _currentState = EnemyState.Finish;
-        OnEnemyDestroyed?.Invoke(this);
+        InGameEventManager.Instance.InvokeEnemyDestroyed(_enemySpawnId);
         StartCoroutine(FinishCoroutine());
     }
 
@@ -101,14 +103,6 @@ public class InGameEnemy : PoolableObject
                     MoveToPlanet();
                 }
                 break;
-        }
-    }
-
-    //행성에게 공격 우선권을 주고 공격 처리
-    private void LateUpdate()
-    {
-        switch (_currentState)
-        {
             case EnemyState.Attacking:
                 if (_canAttack)
                 {
@@ -161,8 +155,9 @@ public class InGameEnemy : PoolableObject
     {
         _canAttack = false;
         yield return new WaitForSeconds(_enemyData.AttackDelay);
-        if (IsAlive())
-            InGameManager.Instance.Planet.TakeDamage(_enemyData.AttackPower);
+        if (IsAlive() == false) yield break;
+        else if (InGameManager.Instance.Planet == null) yield break;
+        InGameManager.Instance.Planet.TakeDamage(_enemyData.AttackPower);
         _canAttack = true;
     }
 

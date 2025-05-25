@@ -32,6 +32,7 @@ public class InGamePlanet : PoolableObject
 
         // 이벤트 구독
         InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateChanged;
+        InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
 
         // 행성 데이터
         _planetData = DataManager.Instance.PlanetData;
@@ -58,7 +59,11 @@ public class InGamePlanet : PoolableObject
         base.OnDespawn();
 
         // 이벤트 구독 해제
-        InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateChanged;
+        if (InGameEventManager.Instance != null)
+        {
+            InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateChanged;
+            InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
+        }
 
         if (_gameRoutine != null)
         {
@@ -95,6 +100,14 @@ public class InGamePlanet : PoolableObject
     {
         UpdateValues();
         DrawRange();
+    }
+
+    private void OnEnemyDestroyed(int enemySpawnId)
+    {
+        if (_targetEnemy != null && _targetEnemy.EnemySpawnId == enemySpawnId)
+        {
+            _targetEnemy = null;
+        }
     }
 
     private void ResetValues()
@@ -169,18 +182,8 @@ public class InGamePlanet : PoolableObject
             _targetEnemy = InGameWaveManager.Instance.GetTargetEnemy(transform.position, _range);
             if (_targetEnemy != null)
             {
-                _targetEnemy.OnEnemyDestroyed += OnTargetEnemyDestroyed;
                 StartCoroutine(AttackWithDelay(_targetEnemy));
             }
-        }
-    }
-
-    private void OnTargetEnemyDestroyed(InGameEnemy enemy)
-    {
-        enemy.OnEnemyDestroyed -= OnTargetEnemyDestroyed;
-        if (_targetEnemy == enemy)
-        {
-            _targetEnemy = null;
         }
     }
 

@@ -19,24 +19,31 @@ public class InGameBullet : PoolableObject
         base.OnSpawn();
         _target = null;
         _currentState = BulletState.Idle;
+        InGameEventManager.Instance.OnEnemyDestroyed += OnTargetDestroyed;
     }
 
     public override void OnDespawn()
     {
         base.OnDespawn();
+        if (InGameEventManager.Instance != null)
+        {
+            InGameEventManager.Instance.OnEnemyDestroyed -= OnTargetDestroyed;
+        }
     }
 
     public void SetTarget(InGameEnemy target)
     {
         _target = target;
-        _target.OnEnemyDestroyed += OnTargetDestroyed;
         _currentState = BulletState.Moving;
     }
 
-    private void OnTargetDestroyed(InGameEnemy enemy)
+    private void OnTargetDestroyed(int enemySpawnId)
     {
-        enemy.OnEnemyDestroyed -= OnTargetDestroyed;
-        _target = null;
+        if (_target != null && _target.EnemySpawnId == enemySpawnId)
+        {
+            _target = null;
+            _currentState = BulletState.Destroy;
+        }
     }
 
     private void Update()

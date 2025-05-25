@@ -47,6 +47,8 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
         // 미리 로드
         await Preload();
+
+        Initialize();
     }
 
     public void StartGame()
@@ -115,6 +117,12 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         return _planet.CurrrentHp;
     }
 
+    private void Initialize()
+    {
+        _currentPoints = 0;
+        InitializeRecorder();
+    }
+
     private IEnumerator CreatePlanetAndStartGame()
     {
         // 행성 생성 대기
@@ -124,7 +132,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
         // 포인트 초기화
         _currentPoints = 0;
-        InGameEventManager.Instance.InvokePointsChanged(_currentPoints);
+        InGameEventManager.Instance.InvokePointsChanged(0, _currentPoints);
 
         // 행성이 생성되면 게임 시작
         _currentState = InGameState.GamePlay;

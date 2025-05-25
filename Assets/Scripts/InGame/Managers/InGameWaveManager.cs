@@ -11,10 +11,13 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     private int _currentWaveLevel = 1;
     private int _currentSpawnCount = 0;
     private int _totalSpawnCount = 0;
+    private float _waveWaitTime = 0f;
+    private int _enemySpawnId = 0;
 
     public async Task Initialize()
     {
         _currentWaveLevel = 1;
+        _enemySpawnId = 0;
         await Task.CompletedTask;
     }
 
@@ -28,6 +31,11 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             return 0f;
         }
         return (float)_currentSpawnCount / (float)_totalSpawnCount;
+    }
+
+    public float GetCurrentWaveWaitProgress()
+    {
+        return _waveWaitTime / Constants.WAVE_INTERVAL;
     }
 
     //웨이브 시작
@@ -87,8 +95,20 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         }
 
         InGameEventManager.Instance.InvokeWaveComplete(_currentWaveLevel);
+        StartCoroutine(WaitForNextWave());
+    }
 
-        yield return new WaitForSeconds(Constants.WAVE_INTERVAL);
+    // 웨이브 완료 후 다음 웨이브 시작 사이 대기
+    private IEnumerator WaitForNextWave()
+    {
+        //웨이브 대기 진행률을 이벤트로 전달
+        _waveWaitTime = 0f;
+        while (_waveWaitTime < Constants.WAVE_INTERVAL)
+        {
+            _waveWaitTime += Time.deltaTime;
+            InGameEventManager.Instance.InvokeWaveWaitProgressChanged(_waveWaitTime / Constants.WAVE_INTERVAL);
+            yield return null;
+        }
 
         if (InGameManager.Instance.IsPlaying == false) yield break;
 
@@ -106,8 +126,9 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         yield return new WaitUntil(() => enemyTask.IsCompleted);
         var enemy = enemyTask.Result;
         EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
-        enemy.Initialize(enemyData);
+        enemy.Initialize(enemyData, _enemySpawnId);
         _enemies.Add(enemy);
+        _enemySpawnId++;
     }
 
     private WaveMetaData GetRandomWaveData(List<WaveMetaData> waveDatas)

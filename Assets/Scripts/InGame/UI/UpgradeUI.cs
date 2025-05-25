@@ -11,15 +11,11 @@ public class UpgradeUI : MonoBehaviour
     private void Start()
     {
         InitializeUI();
-        InGameEventManager.Instance.OnPointsChanged += UpdatePointText;
     }
 
     private void OnDestroy()
     {
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnPointsChanged -= UpdatePointText;
-        }
+        
     }
 
     private void InitializeUI()
