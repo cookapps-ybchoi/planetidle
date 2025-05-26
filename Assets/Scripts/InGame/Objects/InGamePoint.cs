@@ -24,7 +24,7 @@ public class InGamePoint : PoolableObject
     //포인트는 달러로 표시
     public void SetPoint(int point)
     {
-        _pointText.text = $"${point}";
+        _pointText.text = $"<sprite=0>{point}";
         Show();
     }
 
