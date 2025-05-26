@@ -81,7 +81,6 @@ public class DataManagerEditor : Editor
             EditorGUILayout.LabelField("웨이브 ID", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("웨이브 레벨", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("생성 횟수", EditorStyles.boldLabel, GUILayout.Width(60));
-            EditorGUILayout.LabelField("배치 수", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("생성 간격", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("생성 ID", EditorStyles.boldLabel, GUILayout.Width(60));
             EditorGUILayout.LabelField("생성 확률", EditorStyles.boldLabel, GUILayout.Width(60));
@@ -93,7 +92,6 @@ public class DataManagerEditor : Editor
                 EditorGUILayout.LabelField(waveData.WaveId.ToString(), GUILayout.Width(60));
                 EditorGUILayout.LabelField(waveData.WaveLevel.ToString(), GUILayout.Width(60));
                 EditorGUILayout.LabelField(waveData.SpawnCount.ToString(), GUILayout.Width(60));
-                EditorGUILayout.LabelField(waveData.BatchCount.ToString(), GUILayout.Width(60));
                 EditorGUILayout.LabelField(waveData.SpawnInterval.ToString("F1"), GUILayout.Width(60));
                 EditorGUILayout.LabelField(waveData.SpawnId.ToString(), GUILayout.Width(60));
                 EditorGUILayout.LabelField($"{waveData.SpawnRate * 100:F1}%", GUILayout.Width(60));

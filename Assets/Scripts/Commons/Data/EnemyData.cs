@@ -1,6 +1,7 @@
 public enum EnemyType
 {
     Normal,
+    Elite,
     Boss
 }
 
@@ -62,4 +63,6 @@ public class EnemyData
             Hp = 0;
         }
     }
+
+    
 }

@@ -6,16 +6,14 @@ using System.Collections.Generic;
 public class RecordData
 {
     public int TotalEnemiesDestroyed { get; private set; }
+    public int TotalCoinEarned { get; private set; }
     public int TotalPointsEarned { get; private set; }
-    public int TotalPointsSpent { get; private set; }
-    public Dictionary<PlanetStatType, int> PlanetLevelUps { get; private set; } = new Dictionary<PlanetStatType, int>();
 
     public void Initialize()
     {
         TotalEnemiesDestroyed = 0;
+        TotalCoinEarned = 0;
         TotalPointsEarned = 0;
-        TotalPointsSpent = 0;
-        PlanetLevelUps.Clear();
     }
 
     public void RecordEnemyDestroyed()
@@ -25,22 +23,11 @@ public class RecordData
 
     public void RecordPoints(int points)
     {
-        if (points > 0)
-        {
-            TotalPointsEarned += points;
-        }
-        else
-        {
-            TotalPointsSpent += Mathf.Abs(points);
-        }
+        TotalPointsEarned += points;
     }
 
-    public void RecordPlanetLevelUp(PlanetStatType statType)
+    public void RecordCoins(int coin)
     {
-        if (!PlanetLevelUps.ContainsKey(statType))
-        {
-            PlanetLevelUps[statType] = 0;
-        }
-        PlanetLevelUps[statType]++;
+        TotalCoinEarned += coin;
     }
-} 
+}

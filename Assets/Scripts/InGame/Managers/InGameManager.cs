@@ -119,7 +119,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
     private void Initialize()
     {
-        _currentPoints = 0;
+        _totalPoints = 0;
         InitializeRecorder();
     }
 
@@ -131,8 +131,8 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         _planet = task.Result;
 
         // 포인트 초기화
-        _currentPoints = 0;
-        InGameEventManager.Instance.InvokePointsChanged(0, _currentPoints);
+        _totalPoints = 0;
+        InGameEventManager.Instance.InvokePointsChanged(0, _totalPoints);
 
         // 행성이 생성되면 게임 시작
         _currentState = InGameState.GamePlay;

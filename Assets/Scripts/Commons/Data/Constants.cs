@@ -25,4 +25,6 @@ public class Constants
     public const float ENEMY_SPAWN_DISTANCE = 4f;
 
     public const float WAVE_INTERVAL = 2f;
+
+    public const int INGAME_MAX_LEVEL = 20;
 }

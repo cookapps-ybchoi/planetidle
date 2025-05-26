@@ -83,10 +83,18 @@ public class DataManager : GameObjectSingleton<DataManager>
     private List<EnemyMetaData> LoadEnemyMetaDatas()
     {
         List<EnemyMetaData> enemyMetaDatas = new List<EnemyMetaData>();
-        // 적 데이터 생성 (임시)
-        enemyMetaDatas.Add(new EnemyMetaData(1, EnemyType.Normal, hp: 10, moveSpeed: 1f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 2, pointPerLevel: 2));    // 기본
-        enemyMetaDatas.Add(new EnemyMetaData(2, EnemyType.Normal, hp: 8, moveSpeed: 1.5f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 2, pointPerLevel: 2));    // 빠른 속도
+        // 일반 비행기
+        enemyMetaDatas.Add(new EnemyMetaData(1, EnemyType.Normal, hp: 10, moveSpeed: 0.8f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 2, pointPerLevel: 2));    // 기본
+        enemyMetaDatas.Add(new EnemyMetaData(2, EnemyType.Normal, hp: 8, moveSpeed: 1.2f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 2, pointPerLevel: 2));    // 빠른 속도
         enemyMetaDatas.Add(new EnemyMetaData(3, EnemyType.Normal, hp: 30, moveSpeed: 0.5f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 2, pointPerLevel: 2));   // 높은 HP
+        
+        // 엘리트 비행기
+        enemyMetaDatas.Add(new EnemyMetaData(101, EnemyType.Elite, hp: 50, moveSpeed: 0.3f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 5, pointPerLevel: 3));   // 엘리트 1
+        enemyMetaDatas.Add(new EnemyMetaData(102, EnemyType.Elite, hp: 50, moveSpeed: 0.3f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 5, pointPerLevel: 3));   // 엘리트 2
+        
+        // 보스 비행기
+        enemyMetaDatas.Add(new EnemyMetaData(201, EnemyType.Boss, hp: 100, moveSpeed: 0.2f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 50, pointPerLevel: 3));   // 보스
+
         return enemyMetaDatas;
     }
 
@@ -95,42 +103,62 @@ public class DataManager : GameObjectSingleton<DataManager>
         List<WaveMetaData> waveMetaDatas = new List<WaveMetaData>();
         // 웨이브 데이터 생성 (임시)
         // 웨이브 1
-        waveMetaDatas.Add(new WaveMetaData(1, waveLevel: 1, spawnCount: 20, batchCount: 1, spawnInterval: 0.5f, spawnId: 1, spawnRate: 1.0f));
+        waveMetaDatas.Add(new WaveMetaData(1, waveLevel: 1, spawnCount: 1, spawnInterval: 1f, spawnId: 1, spawnRate: 1.0f));
         // 웨이브 2
-        waveMetaDatas.Add(new WaveMetaData(2, waveLevel: 2, spawnCount: 20, batchCount: 1, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.8f));
-        waveMetaDatas.Add(new WaveMetaData(3, waveLevel: 2, spawnCount: 20, batchCount: 1, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.2f));
+        waveMetaDatas.Add(new WaveMetaData(2, waveLevel: 2, spawnCount: 1, spawnInterval: 0.75f, spawnId: 1, spawnRate: 0.8f));
+        waveMetaDatas.Add(new WaveMetaData(3, waveLevel: 2, spawnCount: 1, spawnInterval: 0.75f, spawnId: 2, spawnRate: 0.2f));
         // 웨이브 3
-        waveMetaDatas.Add(new WaveMetaData(4, waveLevel: 3, spawnCount: 20, batchCount: 1, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.9f));
-        waveMetaDatas.Add(new WaveMetaData(5, waveLevel: 3, spawnCount: 20, batchCount: 1, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.9f));
-        waveMetaDatas.Add(new WaveMetaData(6, waveLevel: 3, spawnCount: 20, batchCount: 1, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.1f));
+        waveMetaDatas.Add(new WaveMetaData(4, waveLevel: 3, spawnCount: 1, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.9f));
+        waveMetaDatas.Add(new WaveMetaData(5, waveLevel: 3, spawnCount: 1, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.9f));
+        waveMetaDatas.Add(new WaveMetaData(6, waveLevel: 3, spawnCount: 1, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.1f));
         // 웨이브 4
-        waveMetaDatas.Add(new WaveMetaData(7, waveLevel: 4, spawnCount: 20, batchCount: 2, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.9f));
-        waveMetaDatas.Add(new WaveMetaData(8, waveLevel: 4, spawnCount: 20, batchCount: 2, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.25f));
-        waveMetaDatas.Add(new WaveMetaData(9, waveLevel: 4, spawnCount: 20, batchCount: 2, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.15f));
+        waveMetaDatas.Add(new WaveMetaData(7, waveLevel: 4, spawnCount: 2, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.9f));
+        waveMetaDatas.Add(new WaveMetaData(8, waveLevel: 4, spawnCount: 2, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.25f));
+        waveMetaDatas.Add(new WaveMetaData(9, waveLevel: 4, spawnCount: 2, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.15f));
         // 웨이브 5
-        waveMetaDatas.Add(new WaveMetaData(10, waveLevel: 5, spawnCount: 20, batchCount: 2, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.8f));
-        waveMetaDatas.Add(new WaveMetaData(11, waveLevel: 5, spawnCount: 20, batchCount: 2, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.8f));
-        waveMetaDatas.Add(new WaveMetaData(12, waveLevel: 5, spawnCount: 20, batchCount: 2, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.2f));
+        waveMetaDatas.Add(new WaveMetaData(10, waveLevel: 5, spawnCount: 2, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.8f));
+        waveMetaDatas.Add(new WaveMetaData(11, waveLevel: 5, spawnCount: 2, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.8f));
+        waveMetaDatas.Add(new WaveMetaData(12, waveLevel: 5, spawnCount: 2, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.2f));
         // 웨이브 6
-        waveMetaDatas.Add(new WaveMetaData(13, waveLevel: 6, spawnCount: 20, batchCount: 3, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.8f));
-        waveMetaDatas.Add(new WaveMetaData(14, waveLevel: 6, spawnCount: 20, batchCount: 3, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.8f));
-        waveMetaDatas.Add(new WaveMetaData(15, waveLevel: 6, spawnCount: 20, batchCount: 3, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.2f));
+        waveMetaDatas.Add(new WaveMetaData(13, waveLevel: 6, spawnCount: 3, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.8f));
+        waveMetaDatas.Add(new WaveMetaData(14, waveLevel: 6, spawnCount: 3, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.8f));
+        waveMetaDatas.Add(new WaveMetaData(15, waveLevel: 6, spawnCount: 3, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.2f));
         // 웨이브 7
-        waveMetaDatas.Add(new WaveMetaData(16, waveLevel: 7, spawnCount: 20, batchCount: 3, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.7f));
-        waveMetaDatas.Add(new WaveMetaData(17, waveLevel: 7, spawnCount: 20, batchCount: 3, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.7f));
-        waveMetaDatas.Add(new WaveMetaData(18, waveLevel: 7, spawnCount: 20, batchCount: 3, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.25f));
+        waveMetaDatas.Add(new WaveMetaData(16, waveLevel: 7, spawnCount: 3, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.7f));
+        waveMetaDatas.Add(new WaveMetaData(17, waveLevel: 7, spawnCount: 3, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.7f));
+        waveMetaDatas.Add(new WaveMetaData(18, waveLevel: 7, spawnCount: 3, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.25f));
         // 웨이브 8
-        waveMetaDatas.Add(new WaveMetaData(19, waveLevel: 8, spawnCount: 20, batchCount: 4, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.5f));
-        waveMetaDatas.Add(new WaveMetaData(20, waveLevel: 8, spawnCount: 20, batchCount: 4, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.7f));
-        waveMetaDatas.Add(new WaveMetaData(21, waveLevel: 8, spawnCount: 20, batchCount: 4, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.3f));
+        waveMetaDatas.Add(new WaveMetaData(19, waveLevel: 8, spawnCount: 4, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.5f));
+        waveMetaDatas.Add(new WaveMetaData(20, waveLevel: 8, spawnCount: 4, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.7f));
+        waveMetaDatas.Add(new WaveMetaData(21, waveLevel: 8, spawnCount: 4, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.3f));
         // 웨이브 9
-        waveMetaDatas.Add(new WaveMetaData(22, waveLevel: 9, spawnCount: 20, batchCount: 4, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
-        waveMetaDatas.Add(new WaveMetaData(23, waveLevel: 9, spawnCount: 20, batchCount: 4, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.4f));
-        waveMetaDatas.Add(new WaveMetaData(24, waveLevel: 9, spawnCount: 20, batchCount: 4, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.3f));
+        waveMetaDatas.Add(new WaveMetaData(22, waveLevel: 9, spawnCount: 4, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(23, waveLevel: 9, spawnCount: 4, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(24, waveLevel: 9, spawnCount: 4, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.3f));
         // 웨이브 10
-        waveMetaDatas.Add(new WaveMetaData(25, waveLevel: 10, spawnCount: 20, batchCount: 5, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
-        waveMetaDatas.Add(new WaveMetaData(26, waveLevel: 10, spawnCount: 20, batchCount: 5, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
-        waveMetaDatas.Add(new WaveMetaData(27, waveLevel: 10, spawnCount: 20, batchCount: 5, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(25, waveLevel: 10, spawnCount: 5, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(26, waveLevel: 10, spawnCount: 5, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
+        waveMetaDatas.Add(new WaveMetaData(27, waveLevel: 10, spawnCount: 5, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
+        // 웨이브 11
+        waveMetaDatas.Add(new WaveMetaData(28, waveLevel: 11, spawnCount: 5, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(29, waveLevel: 11, spawnCount: 5, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
+        waveMetaDatas.Add(new WaveMetaData(30, waveLevel: 11, spawnCount: 5, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
+        // 웨이브 12
+        waveMetaDatas.Add(new WaveMetaData(31, waveLevel: 12, spawnCount: 6, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(32, waveLevel: 12, spawnCount: 6, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
+        waveMetaDatas.Add(new WaveMetaData(33, waveLevel: 12, spawnCount: 6, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
+        // 웨이브 13
+        waveMetaDatas.Add(new WaveMetaData(34, waveLevel: 13, spawnCount: 6, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(35, waveLevel: 13, spawnCount: 6, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
+        waveMetaDatas.Add(new WaveMetaData(36, waveLevel: 13, spawnCount: 6, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
+        // 웨이브 14
+        waveMetaDatas.Add(new WaveMetaData(37, waveLevel: 14, spawnCount: 7, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(38, waveLevel: 14, spawnCount: 7, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
+        waveMetaDatas.Add(new WaveMetaData(39, waveLevel: 14, spawnCount: 7, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
+        // 웨이브 15
+        waveMetaDatas.Add(new WaveMetaData(40, waveLevel: 15, spawnCount: 7, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.4f));
+        waveMetaDatas.Add(new WaveMetaData(41, waveLevel: 15, spawnCount: 7, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.6f));
+        waveMetaDatas.Add(new WaveMetaData(42, waveLevel: 15, spawnCount: 7, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.4f));
         return waveMetaDatas;
     }
 

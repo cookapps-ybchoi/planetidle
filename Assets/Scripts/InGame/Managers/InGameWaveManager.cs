@@ -5,6 +5,14 @@ using System.Linq;
 using System.Collections;
 using UnityEngine.Pool;
 
+//총 플레이 시간: 15분 (900초)
+//시간 경과에 따라 적의 속도, 체력, 수, 출현 빈도가 점진적으로 증가
+//웨이브는 총 15단계 존재 누적 시간이 1분이 지날때마다 웨이브 상승
+//1~2분 간격으로 엘리트 몬스터 등장
+//보스는 매 5분마다 등장 (5:00 / 10:00 / 15:00)
+//보스가 등장하면 웨이브 시간은 대기
+//보스가 처리되면 웨이브 시간 다시 증가
+
 public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 {
     private List<InGameEnemy> _enemies = new();
@@ -12,13 +20,109 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     private int _currentSpawnCount = 0;
     private int _totalSpawnCount = 0;
     private float _waveWaitTime = 0f;
+    private Coroutine _currentSpawnCoroutine; // 현재 실행 중인 SpawnEnemies 코루틴
+
+    //게임이 시작되는 생성되는 적의 고유 아이디
     private int _enemySpawnId = 0;
+    private float _waveTime = 0f;
+    private float _totalPlayTime = 0f;
+    private const float TOTAL_GAME_TIME = 900f; // 15분
+    private const float WAVE_INCREASE_INTERVAL = 60f; // 1분
+    private const int MAX_WAVE_LEVEL = 15;
+    private const float ELITE_MONSTER_INTERVAL_INIT = 120f;     // 초기 기본 대기시간 (2분)
+    private const float ELITE_MONSTER_INTERVAL_MIN = 60f;       // 랜덤 최소 대기시간 (1분)
+    private const float ELITE_MONSTER_INTERVAL_MAX = 120f;      // 랜덤 최대 대기시간 (2분)
+    private float _nextEliteMonsterTime = 0f;
+    private int _lastBossWaveTime = 0; // 마지막 보스 웨이브 시간 (분 단위)
+    private bool _isBossWaveActive = false; // 보스 웨이브 진행 중 여부
 
     public async Task Initialize()
     {
         _currentWaveLevel = 1;
         _enemySpawnId = 0;
+        _totalPlayTime = 0f;
+        _waveTime = 0f;
+        _isBossWaveActive = false;
         await Task.CompletedTask;
+    }
+
+    public void StartWave()
+    {
+        _currentWaveLevel = 1;
+        _nextEliteMonsterTime = ELITE_MONSTER_INTERVAL_INIT + Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
+        var waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
+        if (waveDatas != null && waveDatas.Any())
+        {
+            if (_currentSpawnCoroutine != null)
+            {
+                StopCoroutine(_currentSpawnCoroutine);
+            }
+            _currentSpawnCoroutine = StartCoroutine(SpawnEnemies(waveDatas));
+        }
+    }
+
+    private void Update()
+    {
+        if (!InGameManager.Instance.IsPlaying) return;
+
+        // 보스 웨이브가 아닐 때만 웨이브 시간 증가
+        if (!_isBossWaveActive)
+        {
+            _totalPlayTime += Time.deltaTime;
+            _waveTime += Time.deltaTime;
+            _nextEliteMonsterTime -= Time.deltaTime;
+            //_totalPlayTime 1초 증가할 때마다 현재 게임 시간 호출
+            if (Time.frameCount % 60 == 0)
+            {
+                InGameEventManager.Instance.InvokeTimeChanged(_totalPlayTime);
+            }
+        }
+
+        // 1분마다 웨이브 레벨 증가
+        if (_waveTime >= WAVE_INCREASE_INTERVAL && _currentWaveLevel < MAX_WAVE_LEVEL)
+        {
+            _waveTime = 0f;
+            _currentWaveLevel++;
+
+            // 새로운 웨이브의 적들 소환 시작
+            var waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
+            if (waveDatas != null && waveDatas.Any())
+            {
+                if (_currentSpawnCoroutine != null)
+                {
+                    StopCoroutine(_currentSpawnCoroutine);
+                }
+                _currentSpawnCoroutine = StartCoroutine(SpawnEnemies(waveDatas));
+            }
+        }
+
+        // 엘리트 몬스터 등장 체크 (보스 웨이브 중에는 스킵)
+        if (!_isBossWaveActive && _nextEliteMonsterTime <= 0f)
+        {
+            _nextEliteMonsterTime = Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
+            SpawnEliteMonster();
+        }
+
+        // 보스 웨이브 체크 (5분, 10분, 15분)
+        int currentMinute = Mathf.FloorToInt(_totalPlayTime / 60f);
+        if (currentMinute > 0 && currentMinute % 5 == 0 && currentMinute != _lastBossWaveTime)
+        {
+            _lastBossWaveTime = currentMinute;
+            _waveTime = 0f;
+            StartBossWave();
+        }
+    }
+
+    private void StartBossWave()
+    {
+        _isBossWaveActive = true;
+        SpawnBossWave();
+    }
+
+    public void OnBossDefeated()
+    {
+        _isBossWaveActive = false;
+        Debug.Log($"보스 처치 완료. 웨이브 시간 복원: {_waveTime:F1}초");
     }
 
     public int CurrentWave => _currentWaveLevel;
@@ -38,25 +142,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         return _waveWaitTime / Constants.WAVE_INTERVAL;
     }
 
-    //웨이브 시작
-    //웨이브 데이터가 없으면 가장 마지막 웨이브 반복
-    public void StartWave(int waveLevel = 1)
-    {
-        if (InGameManager.Instance.IsPlaying)
-        {
-            _currentWaveLevel = waveLevel;
-            List<WaveMetaData> waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
-            if (waveDatas.Count == 0)
-            {
-                //웨이브 데이터가 없으면 가장 마지막 웨이브 반복
-                var lastWaveLevel = DataManager.Instance.WaveDataList.Max(data => data.WaveLevel);
-                waveDatas.AddRange(DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == lastWaveLevel));
-            }
-            InGameEventManager.Instance.InvokeWaveStart(_currentWaveLevel);
-            StartCoroutine(SpawnEnemies(waveDatas));
-        }
-    }
-
     public void StopWave()
     {
         //전체 적 제거
@@ -65,54 +150,31 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             enemy.Finish();
         }
         _enemies.Clear();
+
+        if (_currentSpawnCoroutine != null)
+        {
+            StopCoroutine(_currentSpawnCoroutine);
+            _currentSpawnCoroutine = null;
+        }
     }
 
     private IEnumerator SpawnEnemies(List<WaveMetaData> waveDatas)
     {
-        _currentSpawnCount = 0;
-        _totalSpawnCount = waveDatas.First().TotalSpawnCount;
-        int spawnCount = waveDatas.First().SpawnCount;
-        int batchCount = waveDatas.First().BatchCount;
         float spawnInterval = waveDatas.First().SpawnInterval;
 
-        for (int i = 0; i < spawnCount; i++)
+        while (true)
         {
-            for (int j = 0; j < batchCount; j++)
+            WaveMetaData selectedWaveData = GetRandomWaveData(waveDatas);
+            int spawnCount = selectedWaveData.SpawnCount;
+            
+            for (int i = 0; i < spawnCount; i++)
             {
-                WaveMetaData selectedWaveData = GetRandomWaveData(waveDatas);
-                if (selectedWaveData != null)
-                {
-                    int randomEnemyId = selectedWaveData.SpawnId;
-                    StartCoroutine(SpawnEnemyCoroutine(randomEnemyId));
-                    _currentSpawnCount++;
-                    InGameEventManager.Instance.InvokeWaveProgressChanged(GetCurrentWaveProgress());
-                }
+                int randomEnemyId = selectedWaveData.SpawnId;
+                StartCoroutine(SpawnEnemyCoroutine(randomEnemyId));
+                _currentSpawnCount++;
             }
-
             yield return new WaitForSeconds(spawnInterval);
-
-            if (InGameManager.Instance.IsPlaying == false) yield break;
-        }
-
-        InGameEventManager.Instance.InvokeWaveComplete(_currentWaveLevel);
-        StartCoroutine(WaitForNextWave());
-    }
-
-    // 웨이브 완료 후 다음 웨이브 시작 사이 대기
-    private IEnumerator WaitForNextWave()
-    {
-        //웨이브 대기 진행률을 이벤트로 전달
-        _waveWaitTime = 0f;
-        while (_waveWaitTime < Constants.WAVE_INTERVAL)
-        {
-            _waveWaitTime += Time.deltaTime;
-            InGameEventManager.Instance.InvokeWaveWaitProgressChanged(_waveWaitTime / Constants.WAVE_INTERVAL);
-            yield return null;
-        }
-
-        if (InGameManager.Instance.IsPlaying == false) yield break;
-
-        StartWave(_currentWaveLevel + 1);
+        }  
     }
 
     private IEnumerator SpawnEnemyCoroutine(int enemyId)
@@ -125,6 +187,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         var enemyTask = AddressableManager.Instance.GetEnemy(enemyId, spawnPosition, transform);
         yield return new WaitUntil(() => enemyTask.IsCompleted);
         var enemy = enemyTask.Result;
+
         EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
         enemy.Initialize(enemyData, _enemySpawnId);
         _enemies.Add(enemy);
@@ -177,5 +240,35 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             }
         }
         return closestEnemy;
+    }
+
+    private void SpawnEliteMonster()
+    {
+        // 엘리트 몬스터 ID는 일반 몬스터 ID보다 큰 값으로 설정
+        int eliteMonsterId = DataManager.Instance.EnemyDataList
+            .Where(data => data.EnemyType == EnemyType.Elite)
+            .OrderBy(x => Random.value)
+            .FirstOrDefault()?.EnemyId ?? 0;
+
+        if (eliteMonsterId > 0)
+        {
+            StartCoroutine(SpawnEnemyCoroutine(eliteMonsterId));
+            InGameEventManager.Instance.InvokeEliteMonsterSpawned(_currentWaveLevel);
+        }
+    }
+
+    private void SpawnBossWave()
+    {
+        int bossMonsterId = DataManager.Instance.EnemyDataList
+            .Where(data => data.EnemyType == EnemyType.Boss)
+            .OrderBy(x => Random.value)
+            .FirstOrDefault()?.EnemyId ?? 0;
+
+        if (bossMonsterId > 0)
+        {
+            StartCoroutine(SpawnEnemyCoroutine(bossMonsterId));
+            Debug.Log($"보스 몬스터 소환: {bossMonsterId} (게임 시간: {_totalPlayTime:F1}초)");
+            InGameEventManager.Instance.InvokeBossWaveStarted(_currentWaveLevel);
+        }
     }
 }
