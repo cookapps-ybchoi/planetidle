@@ -1,9 +1,6 @@
 using UnityEngine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-public partial class InGameManager
+using System.Threading.Tasks;
+public class InGameRecordManager : GameObjectSingleton<InGameRecordManager>
 {
     private RecordData _recordData = new RecordData();
 
@@ -11,18 +8,15 @@ public partial class InGameManager
     public int TotalCoinEarned => _recordData.TotalCoinEarned;
     public int TotalPointsEarned => _recordData.TotalPointsEarned;
 
-    private void InitializeRecorder()
+    private void Start()
     {
-        _recordData.Initialize();
-
-        // 이벤트 구독
         InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
         InGameEventManager.Instance.OnCoinEarned += OnCoinEarned;
     }
 
-    private void CleanupRecorder()
+    protected override void OnDestroy()
     {
-        // 이벤트 구독 해제
+        base.OnDestroy();
         if (InGameEventManager.Instance != null)
         {
             InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
@@ -30,10 +24,27 @@ public partial class InGameManager
         }
     }
 
-    private void OnEnemyDestroyed(int enemyId)
+    public async Task Initialize()
     {
-        _recordData.RecordEnemyDestroyed();
-        InGameEventManager.Instance.InvokeRecordDataChanged(_recordData);
+        _recordData.Initialize();
+        await Task.CompletedTask;
+    }
+
+    public void ResetRecord()
+    {
+        _recordData.Initialize();
+    }
+
+    private void OnEnemyDestroyed(int enemyId, bool isKilled)
+    {
+        if (isKilled)
+        {
+            _recordData.RecordEnemyKilled();
+            InGameEventManager.Instance.InvokeRecordDataChanged(_recordData);
+            // 적 파괴 시 코인 획득
+            int coinAmount = 10; // 기본 코인 획득량
+            InGameEventManager.Instance.InvokeCoinEarned(coinAmount);
+        }
     }
 
     private void OnCoinEarned(int coin)

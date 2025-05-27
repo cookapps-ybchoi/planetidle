@@ -75,15 +75,22 @@ public class InGameEnemy : PoolableObject
                 StartCoroutine(PlayHitEffectCoroutine(damage));
             }
         }
-
-        Debug.Log($"Damage: {damage} Hp: {_enemyData.Hp}");
     }
 
     public void Finish()
     {
         _currentState = EnemyState.Finish;
-        InGameEventManager.Instance.InvokeEnemyDestroyed(_enemySpawnId);
+        // 적 처리 완료 이벤트 호출
+        InGameEventManager.Instance.InvokeEnemyDestroyed(_enemySpawnId, true);
         StartCoroutine(FinishCoroutine());
+    }
+
+    public void Stop()
+    {
+        _currentState = EnemyState.Finish;
+        // 적 처리 완료 이벤트 호출
+        InGameEventManager.Instance.InvokeEnemyDestroyed(_enemySpawnId, false);
+        StartCoroutine(StopCoroutine());
     }
 
     private void Update()
@@ -124,9 +131,16 @@ public class InGameEnemy : PoolableObject
         yield return new WaitUntil(() => pointTask.IsCompleted);
         InGamePoint pointObject = pointTask.Result;
         pointObject.SetPoint(_enemyData.Point);
+        InGameManager.Instance.AddExp(_enemyData.Point);
 
-        // 포인트 추가
-        InGameManager.Instance.AddPoints(_enemyData.Point);
+        InGameWaveManager.Instance.RemoveEnemy(this);
+        AddressableManager.Instance.ReturnToPool(this);
+    }
+
+    private IEnumerator StopCoroutine()
+    {
+        var explosionTask = AddressableManager.Instance.GetExplosion(_explosionId, transform.position, transform.parent);
+        yield return new WaitUntil(() => explosionTask.IsCompleted);
 
         InGameWaveManager.Instance.RemoveEnemy(this);
         AddressableManager.Instance.ReturnToPool(this);

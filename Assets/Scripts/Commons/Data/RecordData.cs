@@ -16,7 +16,7 @@ public class RecordData
         TotalPointsEarned = 0;
     }
 
-    public void RecordEnemyDestroyed()
+    public void RecordEnemyKilled()
     {
         TotalEnemiesDestroyed++;
     }

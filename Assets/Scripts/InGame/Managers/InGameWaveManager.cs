@@ -24,11 +24,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 
     //게임이 시작되는 생성되는 적의 고유 아이디
     private int _enemySpawnId = 0;
-    private float _waveTime = 0f;
     private float _totalPlayTime = 0f;
-    private const float TOTAL_GAME_TIME = 900f; // 15분
-    private const float WAVE_INCREASE_INTERVAL = 60f; // 1분
-    private const int MAX_WAVE_LEVEL = 15;
     private const float ELITE_MONSTER_INTERVAL_INIT = 120f;     // 초기 기본 대기시간 (2분)
     private const float ELITE_MONSTER_INTERVAL_MIN = 60f;       // 랜덤 최소 대기시간 (1분)
     private const float ELITE_MONSTER_INTERVAL_MAX = 120f;      // 랜덤 최대 대기시간 (2분)
@@ -36,13 +32,28 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     private int _lastBossWaveTime = 0; // 마지막 보스 웨이브 시간 (분 단위)
     private bool _isBossWaveActive = false; // 보스 웨이브 진행 중 여부
 
+    protected void Start()
+    {
+        InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (InGameEventManager.Instance != null)
+        {
+            InGameEventManager.Instance.OnLevelChanged -= OnLevelChanged;
+        }
+    }
+
     public async Task Initialize()
     {
         _currentWaveLevel = 1;
         _enemySpawnId = 0;
         _totalPlayTime = 0f;
-        _waveTime = 0f;
         _isBossWaveActive = false;
+
+        InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
         await Task.CompletedTask;
     }
 
@@ -50,6 +61,11 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     {
         _currentWaveLevel = 1;
         _nextEliteMonsterTime = ELITE_MONSTER_INTERVAL_INIT + Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
+        StartSpawn();
+    }
+
+    private void StartSpawn()
+    {
         var waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
         if (waveDatas != null && waveDatas.Any())
         {
@@ -69,30 +85,11 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         if (!_isBossWaveActive)
         {
             _totalPlayTime += Time.deltaTime;
-            _waveTime += Time.deltaTime;
             _nextEliteMonsterTime -= Time.deltaTime;
             //_totalPlayTime 1초 증가할 때마다 현재 게임 시간 호출
             if (Time.frameCount % 60 == 0)
             {
                 InGameEventManager.Instance.InvokeTimeChanged(_totalPlayTime);
-            }
-        }
-
-        // 1분마다 웨이브 레벨 증가
-        if (_waveTime >= WAVE_INCREASE_INTERVAL && _currentWaveLevel < MAX_WAVE_LEVEL)
-        {
-            _waveTime = 0f;
-            _currentWaveLevel++;
-
-            // 새로운 웨이브의 적들 소환 시작
-            var waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
-            if (waveDatas != null && waveDatas.Any())
-            {
-                if (_currentSpawnCoroutine != null)
-                {
-                    StopCoroutine(_currentSpawnCoroutine);
-                }
-                _currentSpawnCoroutine = StartCoroutine(SpawnEnemies(waveDatas));
             }
         }
 
@@ -108,9 +105,14 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         if (currentMinute > 0 && currentMinute % 5 == 0 && currentMinute != _lastBossWaveTime)
         {
             _lastBossWaveTime = currentMinute;
-            _waveTime = 0f;
             StartBossWave();
         }
+    }
+
+    private void OnLevelChanged(int level)
+    {
+        _currentWaveLevel = level;
+        StartSpawn();
     }
 
     private void StartBossWave()
@@ -122,7 +124,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     public void OnBossDefeated()
     {
         _isBossWaveActive = false;
-        Debug.Log($"보스 처치 완료. 웨이브 시간 복원: {_waveTime:F1}초");
     }
 
     public int CurrentWave => _currentWaveLevel;
@@ -147,7 +148,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         //전체 적 제거
         foreach (var enemy in _enemies)
         {
-            enemy.Finish();
+            enemy.Stop();
         }
         _enemies.Clear();
 
@@ -166,7 +167,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         {
             WaveMetaData selectedWaveData = GetRandomWaveData(waveDatas);
             int spawnCount = selectedWaveData.SpawnCount;
-            
+
             for (int i = 0; i < spawnCount; i++)
             {
                 int randomEnemyId = selectedWaveData.SpawnId;
@@ -174,7 +175,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
                 _currentSpawnCount++;
             }
             yield return new WaitForSeconds(spawnInterval);
-        }  
+        }
     }
 
     private IEnumerator SpawnEnemyCoroutine(int enemyId)
@@ -220,23 +221,20 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     public InGameEnemy GetTargetEnemy(Vector3 position, double range)
     {
         InGameEnemy closestEnemy = null;
-        float closestDistanceSquared = float.MaxValue;
-        double rangeSquared = range * range;
+        float closestDistance = float.MaxValue;
 
-        // 거리 기반 필터링을 먼저 수행
-        var nearbyEnemies = _enemies.Where(e => e != null &&
-            (e.transform.position - position).sqrMagnitude <= rangeSquared);
-
-        foreach (var enemy in nearbyEnemies)
+        foreach (var enemy in _enemies)
         {
-            Vector3 direction = enemy.transform.position - position;
-            float distanceSquared = direction.sqrMagnitude;
-            float actualDistance = Mathf.Sqrt(distanceSquared) - enemy.EnemySize;
+            if (enemy == null) continue;
 
-            if (actualDistance <= range && actualDistance < Mathf.Sqrt(closestDistanceSquared))
+            Vector3 direction = enemy.transform.position - position;
+            float distance = direction.magnitude;
+            float actualDistance = distance - enemy.EnemySize;
+
+            if (actualDistance <= range && actualDistance < closestDistance)
             {
                 closestEnemy = enemy;
-                closestDistanceSquared = distanceSquared;
+                closestDistance = actualDistance;
             }
         }
         return closestEnemy;

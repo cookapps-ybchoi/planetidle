@@ -102,7 +102,7 @@ public class InGamePlanet : PoolableObject
         DrawRange();
     }
 
-    private void OnEnemyDestroyed(int enemySpawnId)
+    private void OnEnemyDestroyed(int enemySpawnId, bool isKilled)
     {
         if (_targetEnemy != null && _targetEnemy.EnemySpawnId == enemySpawnId)
         {

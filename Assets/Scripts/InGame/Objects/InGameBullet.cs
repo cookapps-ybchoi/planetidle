@@ -37,7 +37,7 @@ public class InGameBullet : PoolableObject
         _currentState = BulletState.Moving;
     }
 
-    private void OnTargetDestroyed(int enemySpawnId)
+    private void OnTargetDestroyed(int enemySpawnId, bool isKilled)
     {
         if (_target != null && _target.EnemySpawnId == enemySpawnId)
         {

@@ -14,7 +14,7 @@ public class InGameManagerEditor : Editor
         if (InGameEventManager.Instance != null)
         {
             InGameEventManager.Instance.OnGameStateChanged += OnGameStateChanged;
-            InGameEventManager.Instance.OnPointsChanged += OnPointsChanged;
+            InGameEventManager.Instance.OnExpChanged += OnExpChanged;
             InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateLevelChanged;
             InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
         }
@@ -26,7 +26,7 @@ public class InGameManagerEditor : Editor
         if (InGameEventManager.Instance != null)
         {
             InGameEventManager.Instance.OnGameStateChanged -= OnGameStateChanged;
-            InGameEventManager.Instance.OnPointsChanged -= OnPointsChanged;
+            InGameEventManager.Instance.OnExpChanged -= OnExpChanged;
             InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateLevelChanged;
             InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
         }
@@ -38,7 +38,7 @@ public class InGameManagerEditor : Editor
         Repaint();
     }
 
-    private void OnPointsChanged(int points, int totalPoints)
+    private void OnExpChanged(int currentExp, int maxExp)
     {
         // 포인트가 변경될 때마다 에디터 UI 갱신
         Repaint();
@@ -50,7 +50,7 @@ public class InGameManagerEditor : Editor
         Repaint();
     }
 
-    private void OnEnemyDestroyed(int enemyId)
+    private void OnEnemyDestroyed(int enemyId, bool isKilled)
     {
         // 적이 처치될 때마다 에디터 UI 갱신
         Repaint();
@@ -78,7 +78,9 @@ public class InGameManagerEditor : Editor
 
         if (inGameManager.IsPlaying)
         {
-            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("현재 경험치", GUILayout.Width(100));
+            EditorGUILayout.EndHorizontal();    
         }
     }
 }

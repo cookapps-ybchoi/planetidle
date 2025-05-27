@@ -1,3 +1,5 @@
+using DG.Tweening;
+
 public class Constants
 {
     public const int DEFAULT_ID = 1;
@@ -27,4 +29,10 @@ public class Constants
     public const float WAVE_INTERVAL = 2f;
 
     public const int INGAME_MAX_LEVEL = 20;
+
+
+    public const float UI_FADE_TIME = 0.3f;
+    public const float UI_FADE_DELAY = 0.3f;
+
+    public const Ease UI_FADE_EASE_DEFAULT = Ease.OutQuad;
 }

@@ -1,65 +1,62 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-public class InGameUI : MonoBehaviour
+public class InGameUI : GameObjectSingleton<InGameUI>
 {
-
-
-    [SerializeField] private TextMeshProUGUI _timeText;
-    [SerializeField] private TextMeshProUGUI _killCountText;
-    [SerializeField] private TextMeshProUGUI _coinText;
-    [SerializeField] private TextMeshProUGUI _levelText;
-    [SerializeField] private Slider _levelSlider;
+    [SerializeField] private InGameStartUI _startUI;
+    [SerializeField] private InGamePlayUI _playUI;
+    [SerializeField] private InGameResultUI _resultUI;
+    [SerializeField] private InGameChoiceSkillUI _choiceSkillUI;
 
     private void Start()
     {
-        _levelSlider.maxValue = 0;
-        _levelSlider.value = 0;
-        _timeText.text = "00:00";
-        _killCountText.text = "0";
-        _coinText.text = "0";
-        _levelText.text = "1";
+        _playUI.gameObject.SetActive(false);
+        _startUI.gameObject.SetActive(false);
+        _resultUI.gameObject.SetActive(false);
+        _choiceSkillUI.gameObject.SetActive(false);
 
-        InGameEventManager.Instance.OnTimeChanged += OnTimeChanged;
-        InGameEventManager.Instance.OnRecordDataChanged += OnRecordDataChanged;
+        InGameEventManager.Instance.OnGameStateChanged += OnGameStateChanged;
         InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
-        InGameEventManager.Instance.OnPointsChanged += OnPointsChanged;
-
+        InGameEventManager.Instance.OnChoiceSkill += OnChoiceSkill;
     }
-
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         if (InGameEventManager.Instance != null)
         {
-            InGameEventManager.Instance.OnTimeChanged -= OnTimeChanged;
-            InGameEventManager.Instance.OnRecordDataChanged -= OnRecordDataChanged;
+            InGameEventManager.Instance.OnGameStateChanged -= OnGameStateChanged;
             InGameEventManager.Instance.OnLevelChanged -= OnLevelChanged;
-            InGameEventManager.Instance.OnPointsChanged -= OnPointsChanged;
+            InGameEventManager.Instance.OnChoiceSkill -= OnChoiceSkill;
         }
     }
 
-    private void OnTimeChanged(float totalPlayTime)
+    private void OnGameStateChanged(InGameState state)
     {
-        //mm:ss 형식으로 표시
-        int minutes = Mathf.FloorToInt(totalPlayTime / 60);
-        int seconds = Mathf.FloorToInt(totalPlayTime % 60);
-        _timeText.text = $"{minutes:D2}:{seconds:D2}";
-    }
-
-    private void OnRecordDataChanged(RecordData recordData)
-    {
-        _killCountText.text = $"{recordData.TotalEnemiesDestroyed}";
-        _coinText.text = $"{recordData.TotalCoinEarned}";
+        if (state == InGameState.GameReady)
+        {
+            _resultUI.Hide();
+            _startUI.Show();
+        }
+        else if (state == InGameState.GamePlay)
+        {
+            _playUI.Show();
+            _startUI.Hide();
+        }
+        else if (state == InGameState.GameOver)
+        {
+            _playUI.Hide();
+            _resultUI.Show();
+        }
     }
 
     private void OnLevelChanged(int level)
     {
-        _levelText.text = $"{level}";
+        _choiceSkillUI.Show();
     }
 
-    private void OnPointsChanged(int currentPoints, int maxPoints)
+    private void OnChoiceSkill(int skillId)
     {
-        _levelSlider.maxValue = maxPoints;
-        _levelSlider.value = currentPoints;
+        _choiceSkillUI.Hide();
+        InGameManager.Instance.ResumeGame();
     }
 }
