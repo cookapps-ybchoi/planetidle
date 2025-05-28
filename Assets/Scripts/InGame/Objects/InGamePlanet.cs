@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using Game.ObjectPool;
 using System;
+using DG.Tweening;
 
 public class InGamePlanet : PoolableObject
 {
@@ -14,8 +15,10 @@ public class InGamePlanet : PoolableObject
     private PlanetData _planetData;
 
     private InGameEnemy _targetEnemy;
+    private bool _isReady = false;
     private bool _canAttack = true;
     private bool _isPlayingHitEffect = false;
+
     private double _hp;
     private double _maxHp;
     private double _hpRecovery;
@@ -24,11 +27,14 @@ public class InGamePlanet : PoolableObject
     private double _attackCooldownTime;
     private Coroutine _gameRoutine;
 
-    public double CurrrentHp => _hp;
 
+    public bool IsReady => _isReady;
+    public double CurrrentHp => _hp;
     public override void OnSpawn()
     {
         base.OnSpawn();
+
+        _isReady = false;
 
         // 이벤트 구독
         InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateChanged;
@@ -47,11 +53,8 @@ public class InGamePlanet : PoolableObject
         // 값 초기화
         UpdateValues();
 
-        // 초기화 시 범위 표시 업데이트
-        DrawRange();
-
-        // 게임 루틴 시작
-        StartGameRoutine();
+        // 행성 시작 연출
+        PlayPlanetSpawn();
     }
 
     public override void OnDespawn()
@@ -99,7 +102,7 @@ public class InGamePlanet : PoolableObject
     private void OnPlanetStateChanged(PlanetStatType statType, int level)
     {
         UpdateValues();
-        DrawRange();
+        DrawRange(_range);
     }
 
     private void OnEnemyDestroyed(int enemySpawnId, bool isKilled)
@@ -132,6 +135,24 @@ public class InGamePlanet : PoolableObject
         _maxHp = _planetData.GetStatValue(PlanetStatType.Hp);
         _hp += _maxHp - previousMaxHp;
         InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
+    }
+
+    private void PlayPlanetSpawn()
+    {
+        // 행성 스프라이트가 서서히 나타남
+        _planetSprite.color = new Color(1, 1, 1, 0);
+        _planetSprite.DOFade(1, 0.5f).SetEase(Ease.OutQuad);
+
+        // 시작 시 범위를 0~range 까지 증가, Dotween 값 러프 사용
+        _rangeSprite.transform.localScale = new Vector3(0, 0, 1);
+        DOTween.To(() => 0, (float range) =>
+        {
+            DrawRange(range);
+        }, (float)_range, 1f).SetEase(Ease.OutBack).onComplete = () =>
+        {
+            _isReady = true;
+            StartGameRoutine();
+        };
     }
 
     private void StartGameRoutine()
@@ -195,13 +216,13 @@ public class InGamePlanet : PoolableObject
         _canAttack = true;
     }
 
-    private void DrawRange()
+    private void DrawRange(double range)
     {
-        double range = _range * 2f;
-        _rangeSprite.transform.localScale = new Vector3((float)range, (float)range, 1);
+        float fullRange = (float)range * 2f;
+        _rangeSprite.transform.localScale = new Vector3(fullRange, fullRange, 1);
 
         //기본 두께는 0.03 기준 range 1. range 증가 값에 역비례
-        _rangeSprite.material.SetFloat("_Thickness", RANGE_THICKNESS_DEFAULT / (float)range);
+        _rangeSprite.material.SetFloat("_Thickness", RANGE_THICKNESS_DEFAULT / fullRange);
     }
 
     private IEnumerator PlayHitEffectCoroutine(SpriteRenderer spriteRenderer)
@@ -210,7 +231,7 @@ public class InGamePlanet : PoolableObject
 
         Color originalColor = _planetSprite.color;
         Color hitColor = new Color(1f, 0.5f, 0.5f); // 연한 빨간색
-        float duration = 0.025f; // 전체 이펙트 지속시간
+        float duration = 0.02f; // 전체 이펙트 지속시간
 
         // 빨간색으로 변경
         spriteRenderer.color = hitColor;

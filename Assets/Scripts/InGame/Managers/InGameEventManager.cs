@@ -27,7 +27,6 @@ public class InGameEventManager : GameObjectSingleton<InGameEventManager>
     public event Action<RecordData> OnRecordDataChanged;
     public event Action<int> OnLevelChanged;
     public event Action<int> OnChoiceSkill;
-
     public void InvokeGameStateChanged(InGameState state) => OnGameStateChanged?.Invoke(state);
     public void InvokeExpChanged(int currentExp, int maxExp) => OnExpChanged?.Invoke(currentExp, maxExp);
     public void InvokeCoinEarned(int amount) => OnCoinEarned?.Invoke(amount);
@@ -41,7 +40,6 @@ public class InGameEventManager : GameObjectSingleton<InGameEventManager>
     public void InvokeTimeChanged(float totalPlayTime) => OnTimeChanged?.Invoke(totalPlayTime);
     public void InvokeRecordDataChanged(RecordData recordData) => OnRecordDataChanged?.Invoke(recordData);
     public void InvokeChoiceSkill(int skillId) => OnChoiceSkill?.Invoke(skillId);
-
     public async Task Initialize()
     {
         await Task.CompletedTask;

@@ -15,5 +15,6 @@ public class InGameStartUI : BaseUI
     public void OnClickStart()
     {
         InGameManager.Instance.StartGame();
+        Hide();
     }
 }

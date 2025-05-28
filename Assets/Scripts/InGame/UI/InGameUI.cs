@@ -34,13 +34,11 @@ public class InGameUI : GameObjectSingleton<InGameUI>
     {
         if (state == InGameState.GameReady)
         {
-            _resultUI.Hide();
             _startUI.Show();
         }
         else if (state == InGameState.GamePlay)
         {
             _playUI.Show();
-            _startUI.Hide();
         }
         else if (state == InGameState.GameOver)
         {

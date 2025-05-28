@@ -32,5 +32,6 @@ public class InGameResultUI : BaseUI
     public void OnTouch()
     {
         InGameManager.Instance.ReadyToStart();
+        Hide();
     }
 }

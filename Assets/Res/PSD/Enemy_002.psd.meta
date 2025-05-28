@@ -129,10 +129,10 @@ TextureImporter:
       name: Enemy_002_0
       rect:
         serializedVersion: 2
-        x: 87
-        y: 1
-        width: 848
-        height: 1023
+        x: 30
+        y: 0
+        width: 964
+        height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,8 +160,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Enemy_002_0: 9075965046567130796
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

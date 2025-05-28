@@ -3,7 +3,7 @@ using Game.ObjectPool;
 using System;
 using System.Threading.Tasks;
 using System.Collections;
-
+using DG.Tweening;
 public class InGameEnemy : PoolableObject
 {
     private enum EnemyState
@@ -21,7 +21,6 @@ public class InGameEnemy : PoolableObject
     [SerializeField] private float _size = 0.25f;
     [SerializeField] private int _explosionId = 1;
 
-    private int _enemyId;
     private int _enemySpawnId;
     private EnemyState _currentState = EnemyState.Idle;
     private EnemyData _enemyData;
@@ -34,7 +33,8 @@ public class InGameEnemy : PoolableObject
     {
         base.OnSpawn();
         LookAtPlanet();
-        _spriteRenderer.color = Color.white;
+        _spriteRenderer.color = new Color(1, 1, 1, 0);
+        _spriteRenderer.DOFade(1, 0.2f).SetEase(Ease.InQuad);
     }
 
     public override void OnDespawn()

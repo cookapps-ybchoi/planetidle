@@ -147,7 +147,9 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         _totalExp = 0;
         InGameEventManager.Instance.InvokeExpChanged(0, _totalExp);
 
-        // 행성이 생성되면 게임 시작
+        // 행성 준비 대기
+        yield return new WaitUntil(() => _planet.IsReady);
+
         _currentState = InGameState.GamePlay;
         InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
 

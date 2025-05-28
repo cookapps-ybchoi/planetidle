@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3494d6443f82aec47a3598b4dd43c3a0
+guid: 51594f13ca5e7fe4da2be48213494044
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6175977913652255450
-    second: ingame_enemy_003_0
+      213: 8798316271258456706
+    second: Enemy_003_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 500
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,23 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ingame_enemy_003_0
+      name: Enemy_003_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 17
         y: 0
-        width: 200
-        height: 200
-      alignment: 2
-      pivot: {x: 0.5, y: 1}
+        width: 990
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ada96e3d03b75b550800000000000000
-      internalID: 6175977913652255450
+      spriteID: 28256e18806e91a70800000000000000
+      internalID: 8798316271258456706
       vertices: []
       indices: 
       edges: []
@@ -151,8 +151,8 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: bee6fd9c2861c334394c801fa0c02f57
-    internalID: -1129513128
+    spriteID: 
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -160,8 +160,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      ingame_enemy_003_0: 6175977913652255450
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
