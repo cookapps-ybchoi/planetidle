@@ -15,35 +15,6 @@ public class DataManagerEditor : Editor
 
         DataManager dataManager = (DataManager)target;
 
-        EditorGUILayout.Space(10);
-        EditorGUILayout.LabelField("데이터 관리", EditorStyles.boldLabel);
-
-        // 행성 데이터 표시
-        _showPlanetData = EditorGUILayout.Foldout(_showPlanetData, "행성 데이터");
-        if (_showPlanetData && dataManager.PlanetData != null)
-        {
-            EditorGUI.indentLevel++;
-            var planetData = dataManager.PlanetData;
-            
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
-            EditorGUILayout.LabelField("행성 ID", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("행성 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("공격력 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("공격속도 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("체력 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.LabelField("체력회복 레벨", EditorStyles.boldLabel, GUILayout.Width(80));
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(planetData.PlanetId.ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.AttackPower).ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.AttackSpeed).ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.Hp).ToString(), GUILayout.Width(80));
-            EditorGUILayout.LabelField(planetData.GetStatLevel(PlanetStatType.HpRecovery).ToString(), GUILayout.Width(80));
-            EditorGUILayout.EndHorizontal();
-            EditorGUI.indentLevel--;
-        }
-
         // 적 데이터 표시
         _showEnemyData = EditorGUILayout.Foldout(_showEnemyData, "적 데이터");
         if (_showEnemyData && dataManager.EnemyDataList != null)

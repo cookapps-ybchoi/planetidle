@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class InGameChoiceSKillButton : BaseUI
 {
-    [SerializeField] private int _index;
+    [SerializeField] private InGameSkillId _skillId;
 
     [SerializeField] private Button _button;
 
@@ -13,6 +13,6 @@ public class InGameChoiceSKillButton : BaseUI
 
     public void OnClick()
     {
-        InGameEventManager.Instance.InvokeChoiceSkill(_index);
+        InGameEventManager.Instance.InvokeChoiceSkill(_skillId);
     }
 }

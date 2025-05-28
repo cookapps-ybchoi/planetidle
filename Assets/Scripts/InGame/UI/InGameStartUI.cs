@@ -4,7 +4,7 @@ public class InGameStartUI : BaseUI
 {
     public override void Show(bool usingScale = true)
     {
-        base.Show(false);
+        base.Show(usingScale);
     }
 
     public override void Hide()

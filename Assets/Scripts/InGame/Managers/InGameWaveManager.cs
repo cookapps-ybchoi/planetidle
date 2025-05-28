@@ -15,22 +15,22 @@ using UnityEngine.Pool;
 
 public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 {
+    private const float ELITE_MONSTER_INTERVAL_INIT = 120f;     // 초기 기본 대기시간 (2분)
+    private const float ELITE_MONSTER_INTERVAL_MIN = 60f;       // 랜덤 최소 대기시간 (1분)
+    private const float ELITE_MONSTER_INTERVAL_MAX = 120f;      // 랜덤 최대 대기시간 (2분)
+    
     private List<InGameEnemy> _enemies = new();
     private int _currentWaveLevel = 1;
     private int _currentSpawnCount = 0;
     private int _totalSpawnCount = 0;
-    private float _waveWaitTime = 0f;
-    private Coroutine _currentSpawnCoroutine; // 현재 실행 중인 SpawnEnemies 코루틴
-
-    //게임이 시작되는 생성되는 적의 고유 아이디
-    private int _enemySpawnId = 0;
+    private Coroutine _currentSpawnCoroutine;   // 현재 실행 중인 SpawnEnemies 코루틴
+    private int _enemySpawnId = 0;              //게임이 시작되는 생성되는 적의 고유 아이디
     private float _totalPlayTime = 0f;
-    private const float ELITE_MONSTER_INTERVAL_INIT = 120f;     // 초기 기본 대기시간 (2분)
-    private const float ELITE_MONSTER_INTERVAL_MIN = 60f;       // 랜덤 최소 대기시간 (1분)
-    private const float ELITE_MONSTER_INTERVAL_MAX = 120f;      // 랜덤 최대 대기시간 (2분)
     private float _nextEliteMonsterTime = 0f;
     private int _lastBossWaveTime = 0; // 마지막 보스 웨이브 시간 (분 단위)
     private bool _isBossWaveActive = false; // 보스 웨이브 진행 중 여부
+
+    public List<InGameEnemy> Enemies => _enemies;
 
     protected void Start()
     {
@@ -138,11 +138,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         return (float)_currentSpawnCount / (float)_totalSpawnCount;
     }
 
-    public float GetCurrentWaveWaitProgress()
-    {
-        return _waveWaitTime / Constants.WAVE_INTERVAL;
-    }
-
     public void StopWave()
     {
         //전체 적 제거
@@ -151,7 +146,8 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             enemy.Stop();
         }
         _enemies.Clear();
-
+        _totalPlayTime = 0f;
+        
         if (_currentSpawnCoroutine != null)
         {
             StopCoroutine(_currentSpawnCoroutine);
@@ -216,28 +212,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     public void RemoveEnemy(InGameEnemy enemy)
     {
         _enemies.Remove(enemy);
-    }
-
-    public InGameEnemy GetTargetEnemy(Vector3 position, double range)
-    {
-        InGameEnemy closestEnemy = null;
-        float closestDistance = float.MaxValue;
-
-        foreach (var enemy in _enemies)
-        {
-            if (enemy == null) continue;
-
-            Vector3 direction = enemy.transform.position - position;
-            float distance = direction.magnitude;
-            float actualDistance = distance - enemy.EnemySize;
-
-            if (actualDistance <= range && actualDistance < closestDistance)
-            {
-                closestEnemy = enemy;
-                closestDistance = actualDistance;
-            }
-        }
-        return closestEnemy;
     }
 
     private void SpawnEliteMonster()

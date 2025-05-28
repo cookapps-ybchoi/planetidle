@@ -3,6 +3,9 @@ using System.Collections;
 using Game.ObjectPool;
 using System;
 using DG.Tweening;
+using System.Collections.Generic;
+using UnityEngine.Pool;
+using System.Linq;
 
 public class InGamePlanet : PoolableObject
 {
@@ -12,24 +15,16 @@ public class InGamePlanet : PoolableObject
     [SerializeField] private SpriteRenderer _rangeSprite;
     [SerializeField] private int _explosionId = 2;
 
-    private PlanetData _planetData;
 
     private InGameEnemy _targetEnemy;
     private bool _isReady = false;
     private bool _canAttack = true;
     private bool _isPlayingHitEffect = false;
-
-    private double _hp;
-    private double _maxHp;
-    private double _hpRecovery;
-    private double _range;
-    private double _attackSpeed;
-    private double _attackCooldownTime;
     private Coroutine _gameRoutine;
 
-
     public bool IsReady => _isReady;
-    public double CurrrentHp => _hp;
+    public PlanetData PlanetData { get; private set; }
+
     public override void OnSpawn()
     {
         base.OnSpawn();
@@ -37,24 +32,8 @@ public class InGamePlanet : PoolableObject
         _isReady = false;
 
         // 이벤트 구독
-        InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateChanged;
         InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
-
-        // 행성 데이터
-        _planetData = DataManager.Instance.PlanetData;
-        _planetData.Initialize();
-
-        // 행성 스프라이트 색상 초기화
-        _planetSprite.color = Color.white;
-
-        // 캐시된 값 초기화
-        ResetValues();
-
-        // 값 초기화
-        UpdateValues();
-
-        // 행성 시작 연출
-        PlayPlanetSpawn();
+        InGameEventManager.Instance.OnPlanetStateValueChanged += OnPlanetStateValueChanged;
     }
 
     public override void OnDespawn()
@@ -64,8 +43,8 @@ public class InGamePlanet : PoolableObject
         // 이벤트 구독 해제
         if (InGameEventManager.Instance != null)
         {
-            InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateChanged;
             InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
+            InGameEventManager.Instance.OnPlanetStateValueChanged -= OnPlanetStateValueChanged;
         }
 
         if (_gameRoutine != null)
@@ -75,12 +54,28 @@ public class InGamePlanet : PoolableObject
         }
     }
 
+    public void InitData(PlanetData planetData)
+    {
+        PlanetData = planetData;
+    }
+
+    public void ShowPlanet()
+    {
+        // 행성 시작 연출
+        PlayPlanetShow();
+    }
+
+    public double GetStateValue(PlanetStatType statType)
+    {
+        return PlanetData.GetStateValue(statType);
+    }
+
     public void TakeDamage(double damage)
     {
-        _hp -= damage;
-        InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
-        Debug.Log($"TakeDamage: {damage}, hp: {_hp}");
-        if (_hp <= 0)
+        PlanetData.Hp -= damage;
+        InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, PlanetData.Hp);
+        Debug.Log($"TakeDamage: {damage}, hp: {PlanetData.Hp}");
+        if (PlanetData.Hp <= 0)
         {
             InGameManager.Instance.GameOver();
         }
@@ -99,12 +94,13 @@ public class InGamePlanet : PoolableObject
         StartCoroutine(FinishCoroutine());
     }
 
-    private void OnPlanetStateChanged(PlanetStatType statType, int level)
+    private void OnPlanetStateValueChanged(PlanetStatType statType, double value)
     {
-        UpdateValues();
-        DrawRange(_range);
+        if (statType == PlanetStatType.Range)
+        {
+            UpdateRange();
+        }
     }
-
     private void OnEnemyDestroyed(int enemySpawnId, bool isKilled)
     {
         if (_targetEnemy != null && _targetEnemy.EnemySpawnId == enemySpawnId)
@@ -113,33 +109,10 @@ public class InGamePlanet : PoolableObject
         }
     }
 
-    private void ResetValues()
-    {
-        _range = 0;
-        _attackSpeed = 0;
-        _attackCooldownTime = 0;
-        _hp = 0;
-        _maxHp = 0;
-        _hpRecovery = 0;
-    }
-
-    private void UpdateValues()
-    {
-        _range = _planetData.GetStatValue(PlanetStatType.Range);
-        _attackSpeed = _planetData.GetStatValue(PlanetStatType.AttackSpeed);
-        _attackCooldownTime = _planetData.GetStatValue(PlanetStatType.AttackCooltime) / _attackSpeed;
-        _hpRecovery = _planetData.GetStatValue(PlanetStatType.HpRecovery);
-
-        // 최대 체력 증가 만큼만 체력 증가
-        double previousMaxHp = _maxHp;
-        _maxHp = _planetData.GetStatValue(PlanetStatType.Hp);
-        _hp += _maxHp - previousMaxHp;
-        InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
-    }
-
-    private void PlayPlanetSpawn()
+    private void PlayPlanetShow()
     {
         // 행성 스프라이트가 서서히 나타남
+
         _planetSprite.color = new Color(1, 1, 1, 0);
         _planetSprite.DOFade(1, 0.5f).SetEase(Ease.OutQuad);
 
@@ -148,11 +121,25 @@ public class InGamePlanet : PoolableObject
         DOTween.To(() => 0, (float range) =>
         {
             DrawRange(range);
-        }, (float)_range, 1f).SetEase(Ease.OutBack).onComplete = () =>
+        }, (float)PlanetData.Range, 1f).SetEase(Ease.OutBack).onComplete = () =>
         {
             _isReady = true;
             StartGameRoutine();
         };
+    }
+
+    private void UpdateRange()
+    {
+        // 행성 범위 업데이트
+        DrawRange(PlanetData.Range);
+
+        // 1초간 녹색으로 행성의 범위의 변화를 알린다 DOTween 사용  
+        Color originalColor = _rangeSprite.material.GetColor("_Color");
+
+        DOTween.To(() => originalColor, (Color color) =>
+        {
+            _rangeSprite.material.SetColor("_Color", color);
+        }, Color.green, 0.2f).SetEase(Ease.InOutQuad).SetDelay(0.2f).SetLoops(4, LoopType.Yoyo);
     }
 
     private void StartGameRoutine()
@@ -180,10 +167,10 @@ public class InGamePlanet : PoolableObject
             hpRecoveryTimer += Time.deltaTime;
             if (hpRecoveryTimer >= 1f)
             {
-                if (_hp < _maxHp)
+                if (PlanetData.Hp < PlanetData.MaxHp)
                 {
-                    _hp = Math.Min(_hp + _hpRecovery, _maxHp);
-                    InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, _hp);
+                    PlanetData.Hp = Math.Min(PlanetData.Hp + PlanetData.HpRecovery, PlanetData.MaxHp);
+                    InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, PlanetData.Hp);
                 }
                 hpRecoveryTimer = 0f;
             }
@@ -194,26 +181,63 @@ public class InGamePlanet : PoolableObject
 
     private void CheckAndAttackEnemies()
     {
-        if (_targetEnemy != null && _targetEnemy.IsAlive())
+        if (_canAttack)
         {
-            StartCoroutine(AttackWithDelay(_targetEnemy));
-        }
-        else
-        {
-            _targetEnemy = InGameWaveManager.Instance.GetTargetEnemy(transform.position, _range);
-            if (_targetEnemy != null)
-            {
-                StartCoroutine(AttackWithDelay(_targetEnemy));
-            }
+            UpdateTargetsOnRange(transform.position, PlanetData.Range);
+            StartCoroutine(AttackTargetsOnRange());
         }
     }
 
-    private IEnumerator AttackWithDelay(InGameEnemy enemy)
+    private void UpdateTargetsOnRange(Vector3 position, double range)
     {
-        _canAttack = false;
-        yield return StartCoroutine(Attack(enemy));
-        yield return new WaitForSeconds((float)_attackCooldownTime);
-        _canAttack = true;
+
+        foreach (var enemy in InGameWaveManager.Instance.Enemies)
+        {
+            if (enemy == null || !enemy.IsAlive || enemy.IsOnRange) continue;
+
+            Vector3 direction = enemy.transform.position - position;
+            float distance = direction.magnitude;
+            float actualDistance = distance - enemy.EnemySize;
+
+            enemy.SetOnRange(actualDistance <= range);
+        }
+    }
+
+    private IEnumerator AttackTargetsOnRange()
+    {
+        try
+        {
+            List<InGameEnemy> enemies = ListPool<InGameEnemy>.Get();
+            enemies.AddRange(InGameWaveManager.Instance.Enemies.Where(enemy => enemy != null && enemy.IsAlive && enemy.IsOnRange));
+
+            if (enemies != null && enemies.Count > 0)
+            {
+                _canAttack = false;
+                float attackCooltime = (float)PlanetData.AttackCooltime / (float)PlanetData.AttackSpeed;
+
+                int attackCount = Math.Min((int)PlanetData.ShotCount, enemies.Count);
+
+                // 공격 대상이 여러 개일 경우 가장 가까운 대상부터 공격
+                // 공격 대상이 공격 가능 갯수 보다 많을 경우에만 거리순으로 소트
+                if (enemies.Count > attackCount)
+                {
+                    enemies.Sort((a, b) =>
+                        Vector3.Distance(a.transform.position, transform.position)
+                        .CompareTo(Vector3.Distance(b.transform.position, transform.position)));
+                }
+
+                for (int i = 0; i < attackCount; i++)
+                {
+                    StartCoroutine(Attack(enemies[i]));
+                }
+
+                yield return new WaitForSeconds(attackCooltime);
+            }
+        }
+        finally
+        {
+            _canAttack = true;
+        }
     }
 
     private void DrawRange(double range)

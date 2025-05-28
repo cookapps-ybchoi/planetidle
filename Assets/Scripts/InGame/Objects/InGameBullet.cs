@@ -13,6 +13,8 @@ public class InGameBullet : PoolableObject
 
     private BulletState _currentState = BulletState.Idle;
     private InGameEnemy _target;
+    private float _bulletSpeed = Constants.PLANET_BULLET_SPEED;
+    private Vector3 _direction;
 
     public override void OnSpawn()
     {
@@ -57,13 +59,14 @@ public class InGameBullet : PoolableObject
                 }
                 else if (Vector3.Distance(transform.position, _target.transform.position) <= 0.1f)
                 {
-                    double damage = InGameManager.Instance.GetPlanetStateValue(PlanetStatType.AttackPower);
+                    double damage = InGameManager.Instance.Planet.GetStateValue(PlanetStatType.AttackPower);
                     _target.TakeDamage(damage);
                     _currentState = BulletState.Destroy;
                 }
                 else
                 {
-                    MoveToTarget();
+                    _direction = _target.transform.position - transform.position;
+                    MoveToDirection();
                 }
                 break;
             case BulletState.Destroy:
@@ -72,9 +75,9 @@ public class InGameBullet : PoolableObject
         }
     }
 
-    private void MoveToTarget()
+    private void MoveToDirection()
     {
-        transform.position = Vector3.MoveTowards(transform.position, _target.transform.position, Constants.PLANET_BULLET_SPEED * Time.deltaTime);
+        transform.position += _direction.normalized * (_bulletSpeed * Time.deltaTime);
     }
 
     private void Finish()

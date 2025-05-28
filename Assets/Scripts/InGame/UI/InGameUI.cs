@@ -52,7 +52,7 @@ public class InGameUI : GameObjectSingleton<InGameUI>
         _choiceSkillUI.Show();
     }
 
-    private void OnChoiceSkill(int skillId)
+    private void OnChoiceSkill(InGameSkillId skillName)
     {
         _choiceSkillUI.Hide();
         InGameManager.Instance.ResumeGame();

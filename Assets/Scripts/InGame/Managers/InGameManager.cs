@@ -54,7 +54,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         // 미리 로드
         await Preload();
 
-        Initialize();
+        ReadyToStart();
     }
 
     public void StartGame()
@@ -84,8 +84,11 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
         Time.timeScale = 1;
 
-        _currentState = InGameState.GamePlay;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+        if(_currentState != InGameState.GamePlay)   
+        {
+            _currentState = InGameState.GamePlay;
+            InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+        }
     }
 
     public void GameOver()
@@ -104,44 +107,16 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
     }
 
-    public double GetPlanetStateValue(PlanetStatType statType)
-    {
-        return DataManager.Instance.PlanetData.GetStatValue(statType);
-    }
-
-    public double GetPlanetNextLevelStateValue(PlanetStatType statType)
-    {
-        return DataManager.Instance.PlanetData.GetNextLevelStatValue(statType);
-    }
-
-    public int GetPlanetStateLevel(PlanetStatType statType)
-    {
-        return DataManager.Instance.PlanetData.GetStatLevel(statType);
-    }
-
-    public void IncreasePlanetStateLevel(PlanetStatType statType)
-    {
-        int level = DataManager.Instance.PlanetData.IncreaseStateLevel(statType);
-        InGameEventManager.Instance.InvokePlanetStateLevelChanged(statType, level);
-    }
-
-    public double GetCurrentPlanetHp()
-    {
-        return _planet.CurrrentHp;
-    }
-
-    private void Initialize()
-    {
-        _currentState = InGameState.GameReady;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
-    }
-
     private IEnumerator CreatePlanetAndStartGame()
     {
         // 행성 생성 대기
-        var task = AddressableManager.Instance.GetPlanet(DataManager.Instance.PlanetData.PlanetId, Vector3.zero, transform);
+        PlanetData planetData = DataManager.Instance.CreatePlanetData();
+
+        var task = AddressableManager.Instance.GetPlanet(planetData.PlanetId, Vector3.zero, transform);
         yield return new WaitUntil(() => task.IsCompleted);
         _planet = task.Result;
+        _planet.InitData(planetData);
+        _planet.ShowPlanet();
 
         // 포인트 초기화
         _totalExp = 0;

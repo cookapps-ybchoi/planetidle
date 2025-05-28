@@ -15,7 +15,6 @@ public class InGameManagerEditor : Editor
         {
             InGameEventManager.Instance.OnGameStateChanged += OnGameStateChanged;
             InGameEventManager.Instance.OnExpChanged += OnExpChanged;
-            InGameEventManager.Instance.OnPlanetStateLevelChanged += OnPlanetStateLevelChanged;
             InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
         }
     }
@@ -27,7 +26,6 @@ public class InGameManagerEditor : Editor
         {
             InGameEventManager.Instance.OnGameStateChanged -= OnGameStateChanged;
             InGameEventManager.Instance.OnExpChanged -= OnExpChanged;
-            InGameEventManager.Instance.OnPlanetStateLevelChanged -= OnPlanetStateLevelChanged;
             InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
         }
     }
@@ -41,12 +39,6 @@ public class InGameManagerEditor : Editor
     private void OnExpChanged(int currentExp, int maxExp)
     {
         // 포인트가 변경될 때마다 에디터 UI 갱신
-        Repaint();
-    }
-
-    private void OnPlanetStateLevelChanged(PlanetStatType statType, int level)
-    {
-        // 행성 상태 레벨이 변경될 때마다 에디터 UI 갱신
         Repaint();
     }
 

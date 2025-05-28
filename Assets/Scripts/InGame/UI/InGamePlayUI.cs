@@ -43,20 +43,25 @@ public class InGamePlayUI : BaseUI
 
     public override void Show(bool usingScale = true)
     {
-        base.Show(false);
-
-        _levelSlider.value = 0;
-        _timeText.text = "00:00";
-        _killCountText.text = "0";
-        _coinText.text = "0";
-        _levelText.text = "1";
+        base.Show(usingScale);
     }
 
     public override void Hide()
     {
         base.Hide();
+        ResetUI();
     }
 
+    public void ResetUI()
+    {
+        _levelText.text = "1";
+        _levelSlider.value = 0;
+        _targetSliderValue = 0;
+        _currentSliderValue = 0;
+        _timeText.text = "00:00";
+        _killCountText.text = "0";
+        _coinText.text = "0";
+    }
     private void OnTimeChanged(float totalPlayTime)
     {
         //mm:ss 형식으로 표시

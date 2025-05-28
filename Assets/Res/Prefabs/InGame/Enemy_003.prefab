@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8480979061246892724}
   - component: {fileID: 2032040733822272345}
   m_Layer: 0
-  m_Name: Tail
+  m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -159,7 +159,7 @@ GameObject:
   - component: {fileID: 1549053032691322235}
   - component: {fileID: 3694015608849850681}
   m_Layer: 0
-  m_Name: Tail
+  m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -344,6 +344,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 3105939709245788697}
+  _trailRenderer:
+  - {fileID: 2032040733822272345}
+  - {fileID: 3694015608849850681}
   _size: 0.2
   _explosionId: 1
 --- !u!1 &7134005164178348605

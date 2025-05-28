@@ -1,33 +1,44 @@
 using UnityEngine;
 using Game.ObjectPool;
-using System;
-using System.Threading.Tasks;
 using System.Collections;
 using DG.Tweening;
+
+public enum EnemyState
+{
+    Idle,
+    Moving,
+    Attacking,
+    Destroy,
+    Finish,
+}
+
 public class InGameEnemy : PoolableObject
 {
-    private enum EnemyState
-    {
-        Idle,
-        Moving,
-        Attacking,
-        Destroy,
-        Finish,
-    }
 
     public float EnemySize => _size;
 
     [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private TrailRenderer[] _trailRenderer;
     [SerializeField] private float _size = 0.25f;
     [SerializeField] private int _explosionId = 1;
 
-    private int _enemySpawnId;
-    private EnemyState _currentState = EnemyState.Idle;
     private EnemyData _enemyData;
     private bool _isPlayingHitEffect = false;
     private bool _canAttack = true;
 
-    public int EnemySpawnId => _enemySpawnId;
+    public EnemyState CurrentState { get; private set; }
+    public int EnemySpawnId { get; private set; }
+    public bool IsOnRange { get; private set; }
+
+    public bool IsAlive
+    {
+        get
+        {
+            if (_enemyData == null) return false;
+            else if (CurrentState == EnemyState.Destroy || CurrentState == EnemyState.Finish) return false;
+            return _enemyData.MaxHp > 0;
+        }
+    }
 
     public override void OnSpawn()
     {
@@ -35,6 +46,10 @@ public class InGameEnemy : PoolableObject
         LookAtPlanet();
         _spriteRenderer.color = new Color(1, 1, 1, 0);
         _spriteRenderer.DOFade(1, 0.2f).SetEase(Ease.InQuad);
+        foreach (var trail in _trailRenderer)
+        {
+            trail.Clear();
+        }
     }
 
     public override void OnDespawn()
@@ -46,27 +61,26 @@ public class InGameEnemy : PoolableObject
     public void Initialize(EnemyData enemyData, int enemySpawnId)
     {
         _enemyData = enemyData.Copy();
-        _enemySpawnId = enemySpawnId;
-        _currentState = EnemyState.Moving;
+        CurrentState = EnemyState.Moving;
+        EnemySpawnId = enemySpawnId;
+        IsOnRange = false;
     }
 
-    public bool IsAlive()
+    public void SetOnRange(bool isOnRange)
     {
-        if (_enemyData == null) return false;
-        else if (_currentState == EnemyState.Destroy || _currentState == EnemyState.Finish) return false;
-        return _enemyData.MaxHp > 0;
+        IsOnRange = isOnRange;
     }
 
     // 데미지 처리
     public void TakeDamage(double damage)
     {
         //상태가 Destroy 또는 Finish 일 때 스킵
-        if (_currentState == EnemyState.Destroy || _currentState == EnemyState.Finish) return;
+        if (CurrentState == EnemyState.Destroy || CurrentState == EnemyState.Finish) return;
 
         _enemyData.ChangeHp(-damage);
         if (_enemyData.Hp <= 0)
         {
-            _currentState = EnemyState.Destroy;
+            CurrentState = EnemyState.Destroy;
         }
         else
         {
@@ -79,30 +93,30 @@ public class InGameEnemy : PoolableObject
 
     public void Finish()
     {
-        _currentState = EnemyState.Finish;
+        CurrentState = EnemyState.Finish;
         // 적 처리 완료 이벤트 호출
-        InGameEventManager.Instance.InvokeEnemyDestroyed(_enemySpawnId, true);
+        InGameEventManager.Instance.InvokeEnemyDestroyed(EnemySpawnId, true);
         StartCoroutine(FinishCoroutine());
     }
 
     public void Stop()
     {
-        _currentState = EnemyState.Finish;
+        CurrentState = EnemyState.Finish;
         // 적 처리 완료 이벤트 호출
-        InGameEventManager.Instance.InvokeEnemyDestroyed(_enemySpawnId, false);
+        InGameEventManager.Instance.InvokeEnemyDestroyed(EnemySpawnId, false);
         StartCoroutine(StopCoroutine());
     }
 
     private void Update()
     {
-        switch (_currentState)
+        switch (CurrentState)
         {
             case EnemyState.Moving:
                 if (InGameManager.Instance.IsPlaying == false) return;
                 else if (Vector3.Distance(transform.position, InGameManager.Instance.Planet.transform.position) <= _enemyData.AttackRange + _size)
                 {
                     // 행성에 도달했으면 공격 상태로 전환
-                    _currentState = EnemyState.Attacking;
+                    CurrentState = EnemyState.Attacking;
                 }
                 else
                 {
@@ -169,7 +183,7 @@ public class InGameEnemy : PoolableObject
     {
         _canAttack = false;
         yield return new WaitForSeconds(_enemyData.AttackDelay);
-        if (IsAlive() == false) yield break;
+        if (IsAlive == false) yield break;
         else if (InGameManager.Instance.Planet == null) yield break;
         InGameManager.Instance.Planet.TakeDamage(_enemyData.AttackPower);
         _canAttack = true;
@@ -201,7 +215,8 @@ public class InGameEnemy : PoolableObject
     // 적의 크기를 원형으로 표시
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        //공격대상이 된경우 빨강색
+        Gizmos.color = IsOnRange ? Color.red : Color.yellow;
         int segments = 32;
         Vector3 previousSizePoint = transform.position + new Vector3(_size, 0f, 0f);
         for (int i = 0; i <= segments; i++)
