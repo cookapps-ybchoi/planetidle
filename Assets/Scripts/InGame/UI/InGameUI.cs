@@ -8,26 +8,24 @@ public class InGameUI : GameObjectSingleton<InGameUI>
     [SerializeField] private InGameResultUI _resultUI;
     [SerializeField] private InGameChoiceSkillUI _choiceSkillUI;
 
-    private void Start()
+    protected override void Awake()
     {
+        base.Awake();
         _playUI.gameObject.SetActive(false);
         _startUI.gameObject.SetActive(false);
         _resultUI.gameObject.SetActive(false);
         _choiceSkillUI.gameObject.SetActive(false);
 
-        InGameEventManager.Instance.OnGameStateChanged += OnGameStateChanged;
-        InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
-        InGameEventManager.Instance.OnChoiceSkill += OnChoiceSkill;
+        InGameEventHandler.OnGameStateChanged += OnGameStateChanged;
+        InGameEventHandler.OnLevelChanged += OnLevelChanged;
+        InGameEventHandler.OnChoiceSkill += OnChoiceSkill;
     }
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnGameStateChanged -= OnGameStateChanged;
-            InGameEventManager.Instance.OnLevelChanged -= OnLevelChanged;
-            InGameEventManager.Instance.OnChoiceSkill -= OnChoiceSkill;
-        }
+        InGameEventHandler.OnGameStateChanged -= OnGameStateChanged;
+        InGameEventHandler.OnLevelChanged -= OnLevelChanged;
+        InGameEventHandler.OnChoiceSkill -= OnChoiceSkill;
     }
 
     private void OnGameStateChanged(InGameState state)
@@ -49,7 +47,10 @@ public class InGameUI : GameObjectSingleton<InGameUI>
 
     private void OnLevelChanged(int level)
     {
-        _choiceSkillUI.Show();
+        if (level > 1)
+        {
+            _choiceSkillUI.Show();
+        }
     }
 
     private void OnChoiceSkill(InGameSkillId skillName)

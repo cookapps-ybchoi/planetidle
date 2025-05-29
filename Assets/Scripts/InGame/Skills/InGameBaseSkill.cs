@@ -25,17 +25,17 @@ public abstract class InGameBaseSkill : IInGameSkill
 
     public InGameBaseSkill SetSkillMetaData(InGameSkillMetaData skillMetaData)
     {
-        SkillMetaData = skillMetaData;
+        MetaData = skillMetaData;
         return this;
     }
 
-    public InGameSkillMetaData SkillMetaData { get; protected set; }
+    public InGameSkillMetaData MetaData { get; protected set; }
 
-    public InGameSkillId Id => SkillMetaData.Id;
-    public InGameSkillType Type => SkillMetaData.Type;
-    public int Level { get; protected set; } = 1;
+    public InGameSkillId Id => MetaData.Id;
+    public InGameSkillType Type => MetaData.Type;
+    public int Level { get; protected set; } = 0;
 
-    public virtual bool IsMaxLevel => Level >= SkillMetaData.MaxLevel;
+    public virtual bool IsMaxLevel => Level >= MetaData.MaxLevel;
 
     public virtual void LevelUp()
     {

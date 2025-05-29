@@ -21,16 +21,13 @@ public class InGameBullet : PoolableObject
         base.OnSpawn();
         _target = null;
         _currentState = BulletState.Idle;
-        InGameEventManager.Instance.OnEnemyDestroyed += OnTargetDestroyed;
+        InGameEventHandler.OnEnemyDestroyed += OnTargetDestroyed;
     }
 
     public override void OnDespawn()
     {
         base.OnDespawn();
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnEnemyDestroyed -= OnTargetDestroyed;
-        }
+        InGameEventHandler.OnEnemyDestroyed -= OnTargetDestroyed;
     }
 
     public void SetTarget(InGameEnemy target)

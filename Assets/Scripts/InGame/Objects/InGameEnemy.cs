@@ -95,7 +95,7 @@ public class InGameEnemy : PoolableObject
     {
         CurrentState = EnemyState.Finish;
         // 적 처리 완료 이벤트 호출
-        InGameEventManager.Instance.InvokeEnemyDestroyed(EnemySpawnId, true);
+        InGameEventHandler.InvokeEnemyDestroyed(EnemySpawnId, true);
         StartCoroutine(FinishCoroutine());
     }
 
@@ -103,7 +103,7 @@ public class InGameEnemy : PoolableObject
     {
         CurrentState = EnemyState.Finish;
         // 적 처리 완료 이벤트 호출
-        InGameEventManager.Instance.InvokeEnemyDestroyed(EnemySpawnId, false);
+        InGameEventHandler.InvokeEnemyDestroyed(EnemySpawnId, false);
         StartCoroutine(StopCoroutine());
     }
 

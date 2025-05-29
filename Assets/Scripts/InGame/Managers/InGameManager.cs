@@ -39,12 +39,6 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         // InGameWaveManager 초기화
         await InGameWaveManager.Instance.Initialize();
 
-        // InGameEventManager 인스턴스 대기
-        await WaitForInstance(InGameEventManager.Instance);
-
-        // InGameEventManager 초기화
-        await InGameEventManager.Instance.Initialize();
-
         // InGameRecordManager 인스턴스 대기
         await WaitForInstance(InGameRecordManager.Instance);
 
@@ -63,7 +57,8 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
         ResetExp();
         InGameRecordManager.Instance.ResetRecord();
-        
+        InGameSkillManager.Instance.ResetSkills();
+
         // 행성 생성
         StartCoroutine(CreatePlanetAndStartGame());
     }
@@ -75,7 +70,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         Time.timeScale = 0;
 
         _currentState = InGameState.GamePause;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+        InGameEventHandler.InvokeGameStateChanged(_currentState);
     }
 
     public void ResumeGame()
@@ -84,17 +79,17 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
         Time.timeScale = 1;
 
-        if(_currentState != InGameState.GamePlay)   
+        if (_currentState != InGameState.GamePlay)
         {
             _currentState = InGameState.GamePlay;
-            InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+            InGameEventHandler.InvokeGameStateChanged(_currentState);
         }
     }
 
     public void GameOver()
     {
         _currentState = InGameState.GameOver;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+        InGameEventHandler.InvokeGameStateChanged(_currentState);
 
         InGameWaveManager.Instance.StopWave();
         _planet.Finish();
@@ -103,8 +98,9 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
     public void ReadyToStart()
     {
+        InitCamera();
         _currentState = InGameState.GameReady;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
+        InGameEventHandler.InvokeGameStateChanged(_currentState);
     }
 
     private IEnumerator CreatePlanetAndStartGame()
@@ -116,19 +112,27 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         yield return new WaitUntil(() => task.IsCompleted);
         _planet = task.Result;
         _planet.InitData(planetData);
-        _planet.ShowPlanet();
+        _planet.ReadyToStart();
+
+        StartGameCamera(() =>
+        {
+            _planet.PlayStart();
+        });
 
         // 포인트 초기화
         _totalExp = 0;
-        InGameEventManager.Instance.InvokeExpChanged(0, _totalExp);
+        InGameEventHandler.InvokeExpChanged(0, _totalExp);
 
         // 행성 준비 대기
         yield return new WaitUntil(() => _planet.IsReady);
 
         _currentState = InGameState.GamePlay;
-        InGameEventManager.Instance.InvokeGameStateChanged(_currentState);
-
-        InGameWaveManager.Instance.StartWave();
+        
+        // 행성 상태 값 변경 이벤트 호출
+        InGameEventHandler.InvokeGameStateChanged(_currentState);
+        InGameEventHandler.InvokePlanetStateValueChanged(PlanetStatType.Hp, _planet.GetStateValue(PlanetStatType.Hp));
+        InGameEventHandler.InvokePlanetStateValueChanged(PlanetStatType.MaxHp, _planet.GetStateValue(PlanetStatType.MaxHp));
+        InGameEventHandler.InvokeLevelChanged(_currentLevel);
     }
 
     private async Task Preload()

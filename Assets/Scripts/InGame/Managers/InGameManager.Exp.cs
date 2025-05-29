@@ -52,12 +52,12 @@ public partial class InGameManager
         _totalExp += exp;
         _maxExp = GetExpForLevel(_currentLevel);
         int lastMaxExp = GetExpForLevel(_currentLevel - 1);
-        InGameEventManager.Instance.InvokeExpChanged(_totalExp - lastMaxExp, _maxExp - lastMaxExp);
+        InGameEventHandler.InvokeExpChanged(_totalExp - lastMaxExp, _maxExp - lastMaxExp);
 
         if (_totalExp >= _maxExp)
         {
             _currentLevel++;
-            InGameEventManager.Instance.InvokeLevelChanged(_currentLevel);
+            InGameEventHandler.InvokeLevelChanged(_currentLevel);
             PauseGame();
         }
     }
@@ -67,5 +67,6 @@ public partial class InGameManager
         _totalExp = 0;
         _currentLevel = 1;
         _maxExp = GetExpForLevel(_currentLevel);
+        InGameEventHandler.InvokeLevelChanged(_currentLevel);
     }
 }

@@ -7,43 +7,32 @@ public class InGamePlayUI : BaseUI
     [SerializeField] private TextMeshProUGUI _timeText;
     [SerializeField] private TextMeshProUGUI _killCountText;
     [SerializeField] private TextMeshProUGUI _coinText;
-    [SerializeField] private TextMeshProUGUI _levelText;
+    [SerializeField] private TextMeshProUGUI _currentLevelText;
+    [SerializeField] private TextMeshProUGUI _nextLevelText;
+    [SerializeField] private TextMeshProUGUI _hpText;
     [SerializeField] private Slider _levelSlider;
+    [SerializeField] private Slider _hpSlider;
 
-    private float _targetSliderValue = 0;
-    private float _currentSliderValue = 0;
+    private double _hp = 0;
+    private double _maxHp = 0;
 
-    private void Start()
+    protected override void Awake()
     {
-        InGameEventManager.Instance.OnTimeChanged += OnTimeChanged;
-        InGameEventManager.Instance.OnRecordDataChanged += OnRecordDataChanged;
-        InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
-        InGameEventManager.Instance.OnExpChanged += OnExpChanged;
+        base.Awake();
+        InGameEventHandler.OnTimeChanged += OnTimeChanged;
+        InGameEventHandler.OnRecordDataChanged += OnRecordDataChanged;
+        InGameEventHandler.OnLevelChanged += OnLevelChanged;
+        InGameEventHandler.OnExpChanged += OnExpChanged;
+        InGameEventHandler.OnPlanetStateValueChanged += OnPlanetStateValueChanged;
     }
 
-    private void Update()
+    protected void OnDestroy()
     {
-        if (_currentSliderValue != _targetSliderValue)  // 값이 다를 때만 업데이트
-        {
-            _currentSliderValue = Mathf.MoveTowards(_currentSliderValue, _targetSliderValue, Time.deltaTime);
-            _levelSlider.value = _currentSliderValue;
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnTimeChanged -= OnTimeChanged;
-            InGameEventManager.Instance.OnRecordDataChanged -= OnRecordDataChanged;
-            InGameEventManager.Instance.OnLevelChanged -= OnLevelChanged;
-            InGameEventManager.Instance.OnExpChanged -= OnExpChanged;
-        }
-    }
-
-    public override void Show(bool usingScale = true)
-    {
-        base.Show(usingScale);
+        InGameEventHandler.OnTimeChanged -= OnTimeChanged;
+        InGameEventHandler.OnRecordDataChanged -= OnRecordDataChanged;
+        InGameEventHandler.OnLevelChanged -= OnLevelChanged;
+        InGameEventHandler.OnExpChanged -= OnExpChanged;
+        InGameEventHandler.OnPlanetStateValueChanged -= OnPlanetStateValueChanged;
     }
 
     public override void Hide()
@@ -54,13 +43,16 @@ public class InGamePlayUI : BaseUI
 
     public void ResetUI()
     {
-        _levelText.text = "1";
+        _currentLevelText.text = "1";
+        _nextLevelText.text = "2";
+
         _levelSlider.value = 0;
-        _targetSliderValue = 0;
-        _currentSliderValue = 0;
+        _hpSlider.value = 0;
+
         _timeText.text = "00:00";
         _killCountText.text = "0";
         _coinText.text = "0";
+        _hpText.text = string.Empty;
     }
     private void OnTimeChanged(float totalPlayTime)
     {
@@ -78,22 +70,44 @@ public class InGamePlayUI : BaseUI
 
     private void OnLevelChanged(int level)
     {
-        _levelText.text = $"{level}";
-        _levelSlider.value = 0;
-        _currentSliderValue = 0;
-        _targetSliderValue = 0;
+        _currentLevelText.text = $"{level}";
+        _nextLevelText.text = $"{level + 1}";
     }
 
     private void OnExpChanged(int currentExp, int maxExp)
     {
         if (maxExp == 0)
         {
-            _targetSliderValue = 0;
+            _levelSlider.value = 0;
         }
         else
         {
-            _targetSliderValue = (float)currentExp / (float)maxExp;
+            _levelSlider.DOValue((float)currentExp / (float)maxExp, 0.2f).SetUpdate(true);
         }
+
     }
 
+    private void OnPlanetStateValueChanged(PlanetStatType statType, double value)
+    {
+        if (statType == PlanetStatType.Hp)
+        {
+            _hp = value;
+        }
+        else if (statType == PlanetStatType.MaxHp)
+        {
+            _maxHp = value;
+        }
+
+
+        if (_maxHp > 0)
+        {
+            _hpText.text = $"{_hp}/{_maxHp}";
+            _hpSlider.DOValue((float)_hp / (float)_maxHp, 0.2f).SetUpdate(true);
+        }
+        else
+        {
+            _hpSlider.value = 0;
+            _hpText.text = string.Empty;
+        }
+    }
 }

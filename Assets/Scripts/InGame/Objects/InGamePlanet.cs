@@ -32,8 +32,8 @@ public class InGamePlanet : PoolableObject
         _isReady = false;
 
         // 이벤트 구독
-        InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
-        InGameEventManager.Instance.OnPlanetStateValueChanged += OnPlanetStateValueChanged;
+        InGameEventHandler.OnEnemyDestroyed += OnEnemyDestroyed;
+        InGameEventHandler.OnPlanetStateValueChanged += OnPlanetStateValueChanged;
     }
 
     public override void OnDespawn()
@@ -41,11 +41,8 @@ public class InGamePlanet : PoolableObject
         base.OnDespawn();
 
         // 이벤트 구독 해제
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
-            InGameEventManager.Instance.OnPlanetStateValueChanged -= OnPlanetStateValueChanged;
-        }
+        InGameEventHandler.OnEnemyDestroyed -= OnEnemyDestroyed;
+        InGameEventHandler.OnPlanetStateValueChanged -= OnPlanetStateValueChanged;
 
         if (_gameRoutine != null)
         {
@@ -59,10 +56,15 @@ public class InGamePlanet : PoolableObject
         PlanetData = planetData;
     }
 
-    public void ShowPlanet()
+    public void ReadyToStart()
     {
-        // 행성 시작 연출
-        PlayPlanetShow();
+        _rangeSprite.transform.localScale = new Vector3(0, 0, 1);
+    }
+
+    public void PlayStart()
+    {
+        // 행성 범위 연출
+        PlayShowRange();
     }
 
     public double GetStateValue(PlanetStatType statType)
@@ -73,8 +75,7 @@ public class InGamePlanet : PoolableObject
     public void TakeDamage(double damage)
     {
         PlanetData.Hp -= damage;
-        InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, PlanetData.Hp);
-        Debug.Log($"TakeDamage: {damage}, hp: {PlanetData.Hp}");
+        InGameEventHandler.InvokePlanetStateValueChanged(PlanetStatType.Hp, PlanetData.Hp);
         if (PlanetData.Hp <= 0)
         {
             InGameManager.Instance.GameOver();
@@ -109,16 +110,18 @@ public class InGamePlanet : PoolableObject
         }
     }
 
-    private void PlayPlanetShow()
+    private void PlayShowRange()
     {
-        // 행성 스프라이트가 서서히 나타남
+        Color originalColor = _rangeSprite.material.GetColor("_Color");
 
-        _planetSprite.color = new Color(1, 1, 1, 0);
-        _planetSprite.DOFade(1, 0.5f).SetEase(Ease.OutQuad);
+        //투명도가 0에서 1로 변경되는 애니메이션
+        DOTween.To(() => 0f, (float alpha) =>
+        {
+            _rangeSprite.material.SetColor("_Color", new Color(1f, 1f, 1f, alpha));
+        }, 1f, 0.5f).SetEase(Ease.InQuad);
 
-        // 시작 시 범위를 0~range 까지 증가, Dotween 값 러프 사용
-        _rangeSprite.transform.localScale = new Vector3(0, 0, 1);
-        DOTween.To(() => 0, (float range) =>
+
+        DOTween.To(() => 0f, (float range) =>
         {
             DrawRange(range);
         }, (float)PlanetData.Range, 1f).SetEase(Ease.OutBack).onComplete = () =>
@@ -170,7 +173,7 @@ public class InGamePlanet : PoolableObject
                 if (PlanetData.Hp < PlanetData.MaxHp)
                 {
                     PlanetData.Hp = Math.Min(PlanetData.Hp + PlanetData.HpRecovery, PlanetData.MaxHp);
-                    InGameEventManager.Instance.InvokePlanetStateValueChanged(PlanetStatType.Hp, PlanetData.Hp);
+                    InGameEventHandler.InvokePlanetStateValueChanged(PlanetStatType.Hp, PlanetData.Hp);
                 }
                 hpRecoveryTimer = 0f;
             }

@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: f112d9fea8eaae94dbe39314ac94e7c7
   m_currentHash:
     serializedVersion: 2
-    Hash: 60caf2fff98d64fd3903f4b15610254f
+    Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -60,6 +60,7 @@ MonoBehaviour:
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
   - {fileID: 11400000, guid: 3b1ccb857dc50b644b6158974b0cf2f6, type: 2}
+  - {fileID: 11400000, guid: 1443817fb00e2614dbd9e04645eeb8f0, type: 2}
   - {fileID: 11400000, guid: 6615217f86226c148a560c07daca5c3a, type: 2}
   m_BuildSettings:
     m_LogResourceManagerExceptions: 1
@@ -101,6 +102,7 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - InGame
+    - skill_icon
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 08a316e61ee442b428fe773bc8f26c5a, type: 2}

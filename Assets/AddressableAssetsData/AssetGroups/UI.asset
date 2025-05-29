@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: UI
+  m_EditorClassIdentifier: 
+  m_GroupName: UI
+  m_GUID: dbd8eddb02df9114b8dbe7903fc451a9
+  m_SerializeEntries:
+  - m_GUID: 539968a1959ee0941a44ad9f6db0f0a1
+    m_Address: UI/SkillIcons/skill_icon_104
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - skill_icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63fd67cf944f76245920350510e5a2a7
+    m_Address: UI/SkillIcons/skill_icon_102
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - skill_icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bdf0f811fd4ac654ea51b87602778a8a
+    m_Address: UI/SkillIcons/skill_icon_101
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - skill_icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf3c7f7d9bb85a14c84117335236b38a
+    m_Address: UI/SkillIcons/skill_icon_103
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - skill_icon
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8eabb3102d441f479ead26503606313
+    m_Address: UI/SkillIcons/skill_icon_105
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - skill_icon
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 9b76c746759b824469e107627dec51be, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 0e9761e135ca3d54389f75f339b0710a, type: 2}
+    - {fileID: 11400000, guid: d509f109acb2d274d9dcbc2aeb7872d0, type: 2}

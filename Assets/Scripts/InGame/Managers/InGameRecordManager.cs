@@ -8,20 +8,18 @@ public class InGameRecordManager : GameObjectSingleton<InGameRecordManager>
     public int TotalCoinEarned => _recordData.TotalCoinEarned;
     public int TotalPointsEarned => _recordData.TotalPointsEarned;
 
-    private void Start()
+    protected override void Awake()
     {
-        InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
-        InGameEventManager.Instance.OnCoinEarned += OnCoinEarned;
+        base.Awake();
+        InGameEventHandler.OnEnemyDestroyed += OnEnemyDestroyed;
+        InGameEventHandler.OnCoinEarned += OnCoinEarned;
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
-            InGameEventManager.Instance.OnCoinEarned -= OnCoinEarned;
-        }
+        InGameEventHandler.OnEnemyDestroyed -= OnEnemyDestroyed;
+        InGameEventHandler.OnCoinEarned -= OnCoinEarned;
     }
 
     public async Task Initialize()
@@ -40,16 +38,16 @@ public class InGameRecordManager : GameObjectSingleton<InGameRecordManager>
         if (isKilled)
         {
             _recordData.RecordEnemyKilled();
-            InGameEventManager.Instance.InvokeRecordDataChanged(_recordData);
+            InGameEventHandler.InvokeRecordDataChanged(_recordData);
             // 적 파괴 시 코인 획득
             int coinAmount = 10; // 기본 코인 획득량
-            InGameEventManager.Instance.InvokeCoinEarned(coinAmount);
+            InGameEventHandler.InvokeCoinEarned(coinAmount);
         }
     }
 
     private void OnCoinEarned(int coin)
     {
         _recordData.RecordCoins(coin);
-        InGameEventManager.Instance.InvokeRecordDataChanged(_recordData);
+        InGameEventHandler.InvokeRecordDataChanged(_recordData);
     }
 }

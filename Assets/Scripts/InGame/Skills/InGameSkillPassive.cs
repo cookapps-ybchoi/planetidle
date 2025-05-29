@@ -7,7 +7,7 @@ public class InGameSkillAttackPower : InGameBaseSkill
     public override void Apply(InGamePlanet planet)
     {
         // 스킬 효과: 공격력 증가
-        planet.PlanetData.SetStateValue(PlanetStatType.AttackPower, planet.PlanetData.MetaData.AttackPower * (1 + SkillMetaData.FirstValue * Level));
+        planet.PlanetData.SetStateValue(PlanetStatType.AttackPower, planet.PlanetData.MetaData.AttackPower * (1 + MetaData.FirstValue * Level));
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)
@@ -24,7 +24,7 @@ public class InGameSkillMultiShot : InGameBaseSkill
     public override void Apply(InGamePlanet planet)
     {
         // 스킬 효과: 한 번에 n발 발사 (레벨에 따라 증가 가능)
-        planet.PlanetData.SetStateValue(PlanetStatType.ShotCount, SkillMetaData.FirstValue + Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.ShotCount, MetaData.FirstValue + Level);
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)
@@ -41,7 +41,7 @@ public class InGameSkillAttackSpeed : InGameBaseSkill
     public override void Apply(InGamePlanet planet)
     {
 
-        planet.PlanetData.SetStateValue(PlanetStatType.AttackSpeed, planet.PlanetData.MetaData.AttackSpeed + SkillMetaData.FirstValue * Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.AttackSpeed, planet.PlanetData.MetaData.AttackSpeed + MetaData.FirstValue * Level);
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)
@@ -57,7 +57,7 @@ public class InGameSkillAttackRange : InGameBaseSkill
 
     public override void Apply(InGamePlanet planet)
     {
-        planet.PlanetData.SetStateValue(PlanetStatType.Range, planet.PlanetData.MetaData.Range + SkillMetaData.FirstValue * Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.Range, planet.PlanetData.MetaData.Range + MetaData.FirstValue * Level);
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)
@@ -74,7 +74,7 @@ public class InGameSkillHp : InGameBaseSkill
     public override void Apply(InGamePlanet planet)
     {
 
-        planet.PlanetData.SetStateValue(PlanetStatType.MaxHp, planet.PlanetData.MetaData.Hp + SkillMetaData.FirstValue * Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.MaxHp, planet.PlanetData.MetaData.Hp + MetaData.FirstValue * Level);
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)

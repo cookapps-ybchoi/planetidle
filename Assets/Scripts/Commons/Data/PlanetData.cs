@@ -97,7 +97,11 @@ public class PlanetData
                 break;
             case PlanetStatType.MaxHp:
                 //MaHp 증가량 만큼 Hp 증가
-                Hp = Math.Min(Hp + (value - MaxHp), MaxHp);
+                if (value > MaxHp)
+                {
+                    Hp = Math.Min(Hp + (value - MaxHp), MaxHp);
+                    InGameEventHandler.InvokePlanetStateValueChanged(PlanetStatType.Hp, Hp);
+                }
                 MaxHp = value;
                 break;
             case PlanetStatType.HpRecovery:
@@ -120,7 +124,7 @@ public class PlanetData
                 break;
         }
 
-        InGameEventManager.Instance.InvokePlanetStateValueChanged(statType, value);
+        InGameEventHandler.InvokePlanetStateValueChanged(statType, value);
     }
 
     public void SavePlanetData()

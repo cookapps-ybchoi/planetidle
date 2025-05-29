@@ -7,7 +7,7 @@ public class BaseUI : MonoBehaviour
     private CanvasGroup _body;
     [SerializeField] protected CanvasGroup[] _components;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _body = GetComponent<CanvasGroup>();
     }

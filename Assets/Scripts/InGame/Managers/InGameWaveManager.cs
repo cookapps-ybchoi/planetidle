@@ -15,10 +15,10 @@ using UnityEngine.Pool;
 
 public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 {
-    private const float ELITE_MONSTER_INTERVAL_INIT = 120f;     // 초기 기본 대기시간 (2분)
-    private const float ELITE_MONSTER_INTERVAL_MIN = 60f;       // 랜덤 최소 대기시간 (1분)
-    private const float ELITE_MONSTER_INTERVAL_MAX = 120f;      // 랜덤 최대 대기시간 (2분)
-    
+    private const float ELITE_MONSTER_INTERVAL_INIT = 60f;     // 초기 기본 대기시간 (2분)
+    private const float ELITE_MONSTER_INTERVAL_MIN = 30f;       // 랜덤 최소 대기시간 (1분)
+    private const float ELITE_MONSTER_INTERVAL_MAX = 60f;      // 랜덤 최대 대기시간 (2분)
+
     private List<InGameEnemy> _enemies = new();
     private int _currentWaveLevel = 1;
     private int _currentSpawnCount = 0;
@@ -32,18 +32,16 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 
     public List<InGameEnemy> Enemies => _enemies;
 
-    protected void Start()
+    protected override void Awake()
     {
-        InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
+        base.Awake();
+        InGameEventHandler.OnLevelChanged += OnLevelChanged;
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnLevelChanged -= OnLevelChanged;
-        }
+        InGameEventHandler.OnLevelChanged -= OnLevelChanged;
     }
 
     public async Task Initialize()
@@ -52,20 +50,21 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         _enemySpawnId = 0;
         _totalPlayTime = 0f;
         _isBossWaveActive = false;
+        _nextEliteMonsterTime = ELITE_MONSTER_INTERVAL_INIT + Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
 
-        InGameEventManager.Instance.OnLevelChanged += OnLevelChanged;
         await Task.CompletedTask;
     }
 
-    public void StartWave()
+    private void OnLevelChanged(int level)
     {
-        _currentWaveLevel = 1;
-        _nextEliteMonsterTime = ELITE_MONSTER_INTERVAL_INIT + Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
+        _currentWaveLevel = level;
         StartSpawn();
     }
 
     private void StartSpawn()
     {
+        if (!InGameManager.Instance.IsPlaying) return;
+
         var waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
         if (waveDatas != null && waveDatas.Any())
         {
@@ -89,7 +88,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             //_totalPlayTime 1초 증가할 때마다 현재 게임 시간 호출
             if (Time.frameCount % 60 == 0)
             {
-                InGameEventManager.Instance.InvokeTimeChanged(_totalPlayTime);
+                InGameEventHandler.InvokeTimeChanged(_totalPlayTime);
             }
         }
 
@@ -107,12 +106,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             _lastBossWaveTime = currentMinute;
             StartBossWave();
         }
-    }
-
-    private void OnLevelChanged(int level)
-    {
-        _currentWaveLevel = level;
-        StartSpawn();
     }
 
     private void StartBossWave()
@@ -147,7 +140,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         }
         _enemies.Clear();
         _totalPlayTime = 0f;
-        
+
         if (_currentSpawnCoroutine != null)
         {
             StopCoroutine(_currentSpawnCoroutine);
@@ -225,7 +218,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         if (eliteMonsterId > 0)
         {
             StartCoroutine(SpawnEnemyCoroutine(eliteMonsterId));
-            InGameEventManager.Instance.InvokeEliteMonsterSpawned(_currentWaveLevel);
+            InGameEventHandler.InvokeEliteMonsterSpawned(_currentWaveLevel);
         }
     }
 
@@ -240,7 +233,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         {
             StartCoroutine(SpawnEnemyCoroutine(bossMonsterId));
             Debug.Log($"보스 몬스터 소환: {bossMonsterId} (게임 시간: {_totalPlayTime:F1}초)");
-            InGameEventManager.Instance.InvokeBossWaveStarted(_currentWaveLevel);
+            InGameEventHandler.InvokeBossWaveStarted(_currentWaveLevel);
         }
     }
 }

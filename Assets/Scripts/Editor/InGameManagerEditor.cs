@@ -11,23 +11,17 @@ public class InGameManagerEditor : Editor
     private void OnEnable()
     {
         // 에디터가 활성화될 때 이벤트 구독
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnGameStateChanged += OnGameStateChanged;
-            InGameEventManager.Instance.OnExpChanged += OnExpChanged;
-            InGameEventManager.Instance.OnEnemyDestroyed += OnEnemyDestroyed;
-        }
+        InGameEventHandler.OnGameStateChanged += OnGameStateChanged;
+        InGameEventHandler.OnExpChanged += OnExpChanged;
+        InGameEventHandler.OnEnemyDestroyed += OnEnemyDestroyed;
     }
 
     private void OnDisable()
     {
         // 에디터가 비활성화될 때 이벤트 구독 해제
-        if (InGameEventManager.Instance != null)
-        {
-            InGameEventManager.Instance.OnGameStateChanged -= OnGameStateChanged;
-            InGameEventManager.Instance.OnExpChanged -= OnExpChanged;
-            InGameEventManager.Instance.OnEnemyDestroyed -= OnEnemyDestroyed;
-        }
+        InGameEventHandler.OnGameStateChanged -= OnGameStateChanged;
+        InGameEventHandler.OnExpChanged -= OnExpChanged;
+        InGameEventHandler.OnEnemyDestroyed -= OnEnemyDestroyed;
     }
 
     private void OnGameStateChanged(InGameState state)
