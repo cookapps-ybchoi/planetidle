@@ -104,14 +104,14 @@ public class DataManager : GameObjectSingleton<DataManager>
         // 일반 비행기
         enemyMetaDatas.Add(new EnemyMetaData(1, EnemyType.Normal, hp: 8, moveSpeed: 0.8f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 1, hpIncRate: 0.1f));    // 기본
         enemyMetaDatas.Add(new EnemyMetaData(2, EnemyType.Normal, hp: 8, moveSpeed: 1.25f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 1, hpIncRate: 0.1f));    // 빠른 속도
-        enemyMetaDatas.Add(new EnemyMetaData(3, EnemyType.Normal, hp: 20, moveSpeed: 0.5f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 2, hpIncRate: 0.1f));   // 높은 HP
+        enemyMetaDatas.Add(new EnemyMetaData(3, EnemyType.Normal, hp: 20, moveSpeed: 0.5f, attackRange: 0.3f, attackPower: 1f, attackDelay: 1f, point: 1, hpIncRate: 0.1f));   // 높은 HP
 
         // 엘리트 비행기
-        enemyMetaDatas.Add(new EnemyMetaData(101, EnemyType.Elite, hp: 50, moveSpeed: 0.3f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 5, hpIncRate: 0.1f));   // 엘리트 1
-        enemyMetaDatas.Add(new EnemyMetaData(102, EnemyType.Elite, hp: 50, moveSpeed: 0.3f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 5, hpIncRate: 0.1f));   // 엘리트 2
+        enemyMetaDatas.Add(new EnemyMetaData(101, EnemyType.Elite, hp: 100, moveSpeed: 0.3f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 50, hpIncRate: 0.1f));   // 엘리트 1
+        enemyMetaDatas.Add(new EnemyMetaData(102, EnemyType.Elite, hp: 100, moveSpeed: 0.3f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 50, hpIncRate: 0.1f));   // 엘리트 2
 
         // 보스 비행기
-        enemyMetaDatas.Add(new EnemyMetaData(201, EnemyType.Boss, hp: 100, moveSpeed: 0.2f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 50, hpIncRate: 0.1f));   // 보스
+        enemyMetaDatas.Add(new EnemyMetaData(201, EnemyType.Boss, hp: 200, moveSpeed: 0.2f, attackRange: 0.3f, attackPower: 2f, attackDelay: 1f, point: 50, hpIncRate: 0.1f));   // 보스
 
         return enemyMetaDatas;
     }
@@ -168,6 +168,25 @@ public class DataManager : GameObjectSingleton<DataManager>
         waveMetaDatas.Add(new WaveMetaData(39, waveLevel: 14, spawnCount: 3, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.2f));
         // 웨이브 15
         waveMetaDatas.Add(new WaveMetaData(41, waveLevel: 15, spawnCount: 3, spawnInterval: 0.4f, spawnId: 2, spawnRate: 1f));
+        // 웨이브 16
+        waveMetaDatas.Add(new WaveMetaData(43, waveLevel: 16, spawnCount: 4, spawnInterval: 0.6f, spawnId: 1, spawnRate: 0.5f));
+        waveMetaDatas.Add(new WaveMetaData(43, waveLevel: 16, spawnCount: 4, spawnInterval: 0.6f, spawnId: 3, spawnRate: 0.5f));
+        // 웨이브 17
+        waveMetaDatas.Add(new WaveMetaData(45, waveLevel: 17, spawnCount: 4, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.5f));
+        waveMetaDatas.Add(new WaveMetaData(45, waveLevel: 17, spawnCount: 4, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.5f));
+        // 웨이브 18
+        waveMetaDatas.Add(new WaveMetaData(47, waveLevel: 18, spawnCount: 4, spawnInterval: 0.5f, spawnId: 1, spawnRate: 0.34f));
+        waveMetaDatas.Add(new WaveMetaData(47, waveLevel: 18, spawnCount: 4, spawnInterval: 0.5f, spawnId: 2, spawnRate: 0.33f));
+        waveMetaDatas.Add(new WaveMetaData(47, waveLevel: 18, spawnCount: 4, spawnInterval: 0.5f, spawnId: 3, spawnRate: 0.33f));
+        // 웨이브 19
+        waveMetaDatas.Add(new WaveMetaData(49, waveLevel: 19, spawnCount: 4, spawnInterval: 0.4f, spawnId: 1, spawnRate: 0.34f));
+        waveMetaDatas.Add(new WaveMetaData(49, waveLevel: 19, spawnCount: 4, spawnInterval: 0.4f, spawnId: 2, spawnRate: 0.33f));
+        waveMetaDatas.Add(new WaveMetaData(49, waveLevel: 19, spawnCount: 4, spawnInterval: 0.4f, spawnId: 3, spawnRate: 0.33f));
+        // 웨이브 20
+        waveMetaDatas.Add(new WaveMetaData(51, waveLevel: 20, spawnCount: 4, spawnInterval: 0.4f, spawnId: 1, spawnRate: 0.2f));
+        waveMetaDatas.Add(new WaveMetaData(51, waveLevel: 20, spawnCount: 4, spawnInterval: 0.4f, spawnId: 2, spawnRate: 0.3f));
+        waveMetaDatas.Add(new WaveMetaData(51, waveLevel: 20, spawnCount: 4, spawnInterval: 0.4f, spawnId: 3, spawnRate: 0.5f));
+        
         return waveMetaDatas;
     }
 

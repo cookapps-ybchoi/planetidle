@@ -18,8 +18,9 @@ public class InGameEventHandler
     public static event Action<PlanetStatType, double> OnPlanetStateValueChanged;
     public static event Action<int, bool> OnEnemyDestroyed;
     public static event Action<int> OnEliteMonsterSpawned;
-    public static event Action<int> OnBossWaveStarted;
-    public static event Action<int> OnBossWaveCompleted;
+    public static event Action<EnemyData> OnBossWaveStarted;
+    public static event Action<EnemyData> OnBossStateChanged;
+    public static event Action<EnemyData> OnBossWaveCompleted;
     public static event Action<float> OnTimeChanged;
     public static event Action<RecordData> OnRecordDataChanged;
     public static event Action<int> OnLevelChanged;
@@ -33,8 +34,9 @@ public class InGameEventHandler
     public static void InvokePlanetStateValueChanged(PlanetStatType statType, double value) => OnPlanetStateValueChanged?.Invoke(statType, value);
     public static void InvokeEnemyDestroyed(int enemyId, bool isKilled) => OnEnemyDestroyed?.Invoke(enemyId, isKilled);
     public static void InvokeEliteMonsterSpawned(int waveLevel) => OnEliteMonsterSpawned?.Invoke(waveLevel);
-    public static void InvokeBossWaveStarted(int waveLevel) => OnBossWaveStarted?.Invoke(waveLevel);
-    public static void InvokeBossWaveCompleted(int waveLevel) => OnBossWaveCompleted?.Invoke(waveLevel);
+    public static void InvokeBossWaveStarted(EnemyData enemyData) => OnBossWaveStarted?.Invoke(enemyData);
+    public static void InvokeBossStateChanged(EnemyData enemyData) => OnBossStateChanged?.Invoke(enemyData);
+    public static void InvokeBossWaveCompleted(EnemyData enemyData) => OnBossWaveCompleted?.Invoke(enemyData);
     public static void InvokeTimeChanged(float totalPlayTime) => OnTimeChanged?.Invoke(totalPlayTime);
     public static void InvokeRecordDataChanged(RecordData recordData) => OnRecordDataChanged?.Invoke(recordData);
     public static void InvokeChoiceSkill(InGameSkillId skillName) => OnChoiceSkill?.Invoke(skillName);

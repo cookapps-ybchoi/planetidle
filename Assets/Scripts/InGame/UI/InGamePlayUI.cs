@@ -11,7 +11,9 @@ public class InGamePlayUI : BaseUI
     [SerializeField] private TextMeshProUGUI _nextLevelText;
     [SerializeField] private TextMeshProUGUI _hpText;
     [SerializeField] private Slider _levelSlider;
+    [SerializeField] private Slider _bossHpSlider;
     [SerializeField] private Slider _hpSlider;
+    [SerializeField] private InGameSkillItem[] _currentSkillItems;
 
     private double _hp = 0;
     private double _maxHp = 0;
@@ -24,6 +26,10 @@ public class InGamePlayUI : BaseUI
         InGameEventHandler.OnLevelChanged += OnLevelChanged;
         InGameEventHandler.OnExpChanged += OnExpChanged;
         InGameEventHandler.OnPlanetStateValueChanged += OnPlanetStateValueChanged;
+        InGameEventHandler.OnChoiceSkill += OnChoiceSkill;
+        InGameEventHandler.OnBossWaveStarted += OnBossWaveStarted;
+        InGameEventHandler.OnBossStateChanged += OnBossStateChanged;
+        InGameEventHandler.OnBossWaveCompleted += OnBossWaveCompleted;
     }
 
     protected void OnDestroy()
@@ -33,6 +39,10 @@ public class InGamePlayUI : BaseUI
         InGameEventHandler.OnLevelChanged -= OnLevelChanged;
         InGameEventHandler.OnExpChanged -= OnExpChanged;
         InGameEventHandler.OnPlanetStateValueChanged -= OnPlanetStateValueChanged;
+        InGameEventHandler.OnChoiceSkill -= OnChoiceSkill;
+        InGameEventHandler.OnBossWaveStarted -= OnBossWaveStarted;
+        InGameEventHandler.OnBossStateChanged -= OnBossStateChanged;
+        InGameEventHandler.OnBossWaveCompleted -= OnBossWaveCompleted;
     }
 
     public override void Hide()
@@ -53,7 +63,27 @@ public class InGamePlayUI : BaseUI
         _killCountText.text = "0";
         _coinText.text = "0";
         _hpText.text = string.Empty;
+
+        _bossHpSlider.gameObject.SetActive(false);
+        _levelSlider.gameObject.SetActive(true);
     }
+
+    private void OnChoiceSkill(InGameSkillId skillId)
+    {
+        var skills = InGameSkillManager.Instance.GetLearnedSkills();
+        for (int i = 0; i < _currentSkillItems.Length; i++)
+        {
+            if (i < skills.Count)
+            {
+                _currentSkillItems[i].SetSkill(skills[i]);
+            }
+            else
+            {
+                _currentSkillItems[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
     private void OnTimeChanged(float totalPlayTime)
     {
         //mm:ss 형식으로 표시
@@ -72,19 +102,28 @@ public class InGamePlayUI : BaseUI
     {
         _currentLevelText.text = $"{level}";
         _nextLevelText.text = $"{level + 1}";
+        _levelSlider.DOKill();
+        _levelSlider.value = 0;
     }
 
     private void OnExpChanged(int currentExp, int maxExp)
     {
-        if (maxExp == 0)
+        if (currentExp == 0 || maxExp == 0)
         {
             _levelSlider.value = 0;
         }
         else
         {
-            _levelSlider.DOValue((float)currentExp / (float)maxExp, 0.2f).SetUpdate(true);
+            float targetValue = (float)currentExp / (float)maxExp;
+            if (_levelSlider.value < targetValue)
+            {
+                _levelSlider.DOValue(targetValue, 0.2f).SetUpdate(true);
+            }
+            else
+            {
+                _levelSlider.value = targetValue;
+            }
         }
-
     }
 
     private void OnPlanetStateValueChanged(PlanetStatType statType, double value)
@@ -108,6 +147,34 @@ public class InGamePlayUI : BaseUI
         {
             _hpSlider.value = 0;
             _hpText.text = string.Empty;
+        }
+    }
+
+    private void OnBossStateChanged(EnemyData enemyData)
+    {
+        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        {
+            _bossHpSlider.DOValue((float)enemyData.Hp / (float)enemyData.MaxHp, 0.2f).SetUpdate(true);
+        }
+    }
+
+    private void OnBossWaveStarted(EnemyData enemyData)
+    {
+        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        {
+            _bossHpSlider.gameObject.SetActive(true);
+            _bossHpSlider.value = 0;
+            _bossHpSlider.DOValue(1, 0.2f).SetUpdate(true);
+            _levelSlider.gameObject.SetActive(false);
+        }
+    }
+
+    private void OnBossWaveCompleted(EnemyData enemyData)
+    {
+        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        {
+            _bossHpSlider.gameObject.SetActive(false);
+            _levelSlider.gameObject.SetActive(true);
         }
     }
 }

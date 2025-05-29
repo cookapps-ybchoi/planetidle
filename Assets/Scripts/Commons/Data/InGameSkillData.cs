@@ -13,6 +13,7 @@ public enum InGameSkillType
 {
     Passive,
     Active,
+    Once,
 }
 
 

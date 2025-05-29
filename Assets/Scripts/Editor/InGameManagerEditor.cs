@@ -66,7 +66,14 @@ public class InGameManagerEditor : Editor
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("현재 경험치", GUILayout.Width(100));
-            EditorGUILayout.EndHorizontal();    
+            EditorGUILayout.EndHorizontal();
+
+            //타임스케일 조절
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("타임스케일", GUILayout.Width(100));
+            float timeScale = EditorGUILayout.Slider(Time.timeScale, 0f, 5f);
+            Time.timeScale = timeScale;
+            EditorGUILayout.EndHorizontal();
         }
     }
 }

@@ -12,6 +12,8 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
     public bool IsPlaying => _currentState == InGameState.GamePlay;
 
     private InGameState _currentState = InGameState.None;
+    
+    private float _lastTimeScale = 1f;
 
     private async void Start()
     {
@@ -69,6 +71,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
     {
         if (_currentState != InGameState.GamePlay) return;
 
+        _lastTimeScale = Time.timeScale;
         Time.timeScale = 0;
 
         _currentState = InGameState.GamePause;
@@ -79,7 +82,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
     {
         if (_currentState != InGameState.GamePause) return;
 
-        Time.timeScale = 1;
+        Time.timeScale = _lastTimeScale;
 
         if (_currentState != InGameState.GamePlay)
         {

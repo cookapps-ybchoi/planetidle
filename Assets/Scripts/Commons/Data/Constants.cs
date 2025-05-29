@@ -12,7 +12,7 @@ public class Constants
     public const double PLANET_ATTACK_POWER_DEFUALT = 10f;
     public const double PLANET_ATTACK_COOLTIME_DEFUALT = 0.5f;
     public const double PLANET_ATTACK_SPEED_DEFUALT = 1f;
-    public const double PLANET_RANGE_DEFUALT = 2f;
+    public const double PLANET_RANGE_DEFUALT = 1.5f;
     public const double PLANET_HP_DEFAULT = 20f;
     public const double PLANET_HP_RECOVERY_DEFAULT = 0f;
     public const double PLANET_SHOT_COUNT_DEFAULT = 1f;

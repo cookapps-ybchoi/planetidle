@@ -58,7 +58,10 @@ public class InGamePlanet : PoolableObject
 
     public void ReadyToStart()
     {
-        _rangeSprite.transform.localScale = new Vector3(0, 0, 1);
+        if (_rangeSprite != null)
+        {
+            _rangeSprite.transform.localScale = new Vector3(0, 0, 1);
+        }
     }
 
     public void PlayStart()
@@ -134,15 +137,24 @@ public class InGamePlanet : PoolableObject
     private void UpdateRange()
     {
         // 행성 범위 업데이트
-        DrawRange(PlanetData.Range);
+        _rangeSprite.transform.localScale = new Vector3(0, 0, 1);
 
-        // 1초간 녹색으로 행성의 범위의 변화를 알린다 DOTween 사용  
         Color originalColor = _rangeSprite.material.GetColor("_Color");
+        _rangeSprite.material.SetColor("_Color", Color.green);
 
-        DOTween.To(() => originalColor, (Color color) =>
+        DOTween.To(() => 0f, (float range) =>
         {
-            _rangeSprite.material.SetColor("_Color", color);
-        }, Color.green, 0.2f).SetEase(Ease.InOutQuad).SetDelay(0.2f).SetLoops(4, LoopType.Yoyo);
+            DrawRange(range);
+        }, (float)PlanetData.Range, 1f).SetEase(Ease.OutBack).onComplete = () =>
+        {
+            DOTween.To(() => originalColor, (Color color) =>
+            {
+                _rangeSprite.material.SetColor("_Color", color);
+            }, Color.green, 0.5f).SetEase(Ease.InOutQuad).SetLoops(4, LoopType.Yoyo).onComplete = () =>
+            {
+                DrawRange(PlanetData.Range);
+            };
+        };
     }
 
     private void StartGameRoutine()

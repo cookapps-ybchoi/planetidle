@@ -64,6 +64,11 @@ public class InGameEnemy : PoolableObject
         CurrentState = EnemyState.Moving;
         EnemySpawnId = enemySpawnId;
         IsOnRange = false;
+
+        if (_enemyData.MetaData.EnemyType == EnemyType.Boss)
+        {
+            InGameEventHandler.InvokeBossStateChanged(_enemyData);
+        }
     }
 
     public void SetOnRange(bool isOnRange)
@@ -78,9 +83,20 @@ public class InGameEnemy : PoolableObject
         if (CurrentState == EnemyState.Destroy || CurrentState == EnemyState.Finish) return;
 
         _enemyData.ChangeHp(-damage);
+
+        if (_enemyData.MetaData.EnemyType == EnemyType.Boss)
+        {
+            InGameEventHandler.InvokeBossStateChanged(_enemyData);
+        }
+
         if (_enemyData.Hp <= 0)
         {
             CurrentState = EnemyState.Destroy;
+
+            if (_enemyData.MetaData.EnemyType == EnemyType.Boss)
+            {
+                InGameEventHandler.InvokeBossWaveCompleted(_enemyData);
+            }
         }
         else
         {
