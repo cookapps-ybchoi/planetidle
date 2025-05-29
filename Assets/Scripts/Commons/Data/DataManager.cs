@@ -208,7 +208,7 @@ public class DataManager : GameObjectSingleton<DataManager>
             id: InGameSkillId.AttackRange,
             type: InGameSkillType.Passive,
             maxLevel: 5,
-            firstValue: 0.2,
+            firstValue: 0.1,
             secondValue: 0));
 
         inGameSkillMetaDatas.Add(new InGameSkillMetaData(
@@ -219,8 +219,6 @@ public class DataManager : GameObjectSingleton<DataManager>
             maxLevel: 5,
             firstValue: 0.5,
             secondValue: 0));
-
-
 
         return inGameSkillMetaDatas;
     }

@@ -1,5 +1,7 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+
 public class DistanceGizmo2D : MonoBehaviour
 {
     [SerializeField] private int maxDistance = 5; // 최대 거리 (0.5 단위로 곱해짐)
@@ -43,4 +45,5 @@ public class DistanceGizmo2D : MonoBehaviour
         UnityEditor.Handles.color = textColor;
         UnityEditor.Handles.Label(textPosition, radius.ToString("F2"));
     }
-} 
+}
+#endif

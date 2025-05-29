@@ -1,14 +1,10 @@
 fileFormatVersion: 2
-guid: 7a3327860e5b74536a19c15415d850dd
-AssetOrigin:
-  serializedVersion: 1
-  productId: 272918
-  packageName: GUI Pro - Super Casual(+PSD)
-  packageVersion: 1.2.0
-  assetPath: Assets/Layer Lab/GUI Pro-SuperCasual/ResourcesData/Sprites/Components/IconMisc/SkillIcon02_1.png
-  uploadId: 714429
+guid: 9158f2e948bfdb742bf0189a22c13dbb
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 355257394766667659
+    second: "ChatGPT Image 2025\uB144 5\uC6D4 29\uC77C \uC624\uD6C4 11_01_56_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -76,20 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -102,19 +85,6 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Standalone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -154,7 +124,29 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: "ChatGPT Image 2025\uB144 5\uC6D4 29\uC77C \uC624\uD6C4 11_01_56_0"
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8fd5e2e7b02ee400800000000000000
+      internalID: 355257394766667659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -168,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      "ChatGPT Image 2025\uB144 5\uC6D4 29\uC77C \uC624\uD6C4 11_01_56_0": 355257394766667659
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

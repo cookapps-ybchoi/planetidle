@@ -2894,11 +2894,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f54b860e71187e84b83ab2f0028380f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxDistance: 10
-  gizmoColor: {r: 1, g: 1, b: 1, a: 0.3}
-  segments: 50
-  textSize: 0.2
-  textColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!4 &155359866
 Transform:
   m_ObjectHideFlags: 0

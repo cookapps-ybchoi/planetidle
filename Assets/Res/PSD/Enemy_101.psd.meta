@@ -1,14 +1,13 @@
 fileFormatVersion: 2
-guid: f188e9f1c5c8449cf86dbb68ccc622e2
-AssetOrigin:
-  serializedVersion: 1
-  productId: 272918
-  packageName: GUI Pro - Super Casual(+PSD)
-  packageVersion: 1.2.0
-  assetPath: Assets/Layer Lab/GUI Pro-SuperCasual/ResourcesData/Sprites/Components/IconMisc/SkillIcon01_3.png
-  uploadId: 714429
+guid: 4290c557d34fbcd42bc6b67f4c20dade
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: -1980681038658380529
+    second: ingame_enemy_101_0
+  - first:
+      213: 6885763117105850882
+    second: ingame_enemy_101_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -50,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -88,33 +87,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: Standalone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -154,12 +127,56 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: ingame_enemy_101_0
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 2
+        width: 966
+        height: 1022
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0d5a65e6153384e0800000000000000
+      internalID: -1980681038658380529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ingame_enemy_101_1
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 2
+        width: 15
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20aa49a92152f8f50800000000000000
+      internalID: 6885763117105850882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -168,7 +185,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ingame_enemy_101_0: -1980681038658380529
+      ingame_enemy_101_1: 6885763117105850882
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

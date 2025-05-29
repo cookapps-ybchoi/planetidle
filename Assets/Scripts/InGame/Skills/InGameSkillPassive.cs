@@ -41,7 +41,7 @@ public class InGameSkillAttackSpeed : InGameBaseSkill
     public override void Apply(InGamePlanet planet)
     {
 
-        planet.PlanetData.SetStateValue(PlanetStatType.AttackSpeed, planet.PlanetData.MetaData.AttackSpeed + MetaData.FirstValue * Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.AttackSpeed, planet.PlanetData.MetaData.AttackSpeed * (1 + MetaData.FirstValue * Level));
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)
@@ -57,7 +57,7 @@ public class InGameSkillAttackRange : InGameBaseSkill
 
     public override void Apply(InGamePlanet planet)
     {
-        planet.PlanetData.SetStateValue(PlanetStatType.Range, planet.PlanetData.MetaData.Range + MetaData.FirstValue * Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.Range, planet.PlanetData.MetaData.Range * (1 + MetaData.FirstValue * Level));
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)
@@ -74,7 +74,7 @@ public class InGameSkillHp : InGameBaseSkill
     public override void Apply(InGamePlanet planet)
     {
 
-        planet.PlanetData.SetStateValue(PlanetStatType.MaxHp, planet.PlanetData.MetaData.Hp + MetaData.FirstValue * Level);
+        planet.PlanetData.SetStateValue(PlanetStatType.MaxHp, planet.PlanetData.MetaData.Hp * (1 + MetaData.FirstValue * Level));
 
         // 스페셜 효과: 관통 혹은 각도 확산 등 추가 효과
         if (IsMaxLevel)

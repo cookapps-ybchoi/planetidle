@@ -61,6 +61,8 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
 
         // 행성 생성
         StartCoroutine(CreatePlanetAndStartGame());
+
+        Application.targetFrameRate = 60;
     }
 
     public void PauseGame()
@@ -94,6 +96,8 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         InGameWaveManager.Instance.StopWave();
         _planet.Finish();
         _planet = null;
+
+        Application.targetFrameRate = 45;
     }
 
     public void ReadyToStart()
@@ -127,7 +131,7 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         yield return new WaitUntil(() => _planet.IsReady);
 
         _currentState = InGameState.GamePlay;
-        
+
         // 행성 상태 값 변경 이벤트 호출
         InGameEventHandler.InvokeGameStateChanged(_currentState);
         InGameEventHandler.InvokePlanetStateValueChanged(PlanetStatType.Hp, _planet.GetStateValue(PlanetStatType.Hp));
