@@ -28,7 +28,7 @@ public class InGameRecordManager : GameObjectSingleton<InGameRecordManager>
         await Task.CompletedTask;
     }
 
-    public void ResetRecord()
+    public void ReadyToStart()
     {
         _recordData.Initialize();
     }

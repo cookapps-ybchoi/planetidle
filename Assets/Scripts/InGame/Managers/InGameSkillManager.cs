@@ -20,7 +20,7 @@ public class InGameSkillManager : GameObjectSingleton<InGameSkillManager>
         InGameEventHandler.OnChoiceSkill -= OnChoiceSkill;
     }
 
-    public void ResetSkills()
+    public void ReadyToStart()
     {
         _learnedSkills.Clear();
     }

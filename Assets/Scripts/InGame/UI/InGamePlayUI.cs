@@ -66,6 +66,11 @@ public class InGamePlayUI : BaseUI
 
         _bossHpSlider.gameObject.SetActive(false);
         _levelSlider.gameObject.SetActive(true);
+
+        for (int i = 0; i < _currentSkillItems.Length; i++)
+        {
+            _currentSkillItems[i].gameObject.SetActive(false);
+        }
     }
 
     private void OnChoiceSkill(InGameSkillId skillId)

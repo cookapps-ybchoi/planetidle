@@ -15,10 +15,6 @@ using UnityEngine.Pool;
 
 public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 {
-    private const float ELITE_MONSTER_INTERVAL_INIT = 60f;     // 초기 기본 대기시간 (1분)
-    private const float ELITE_MONSTER_INTERVAL_MIN = 30f;       // 랜덤 최소 대기시간 (0.5분)
-    private const float ELITE_MONSTER_INTERVAL_MAX = 60f;      // 랜덤 최대 대기시간 (1분)
-
     private List<InGameEnemy> _enemies = new();
     private int _currentWaveLevel = 1;
     private int _currentSpawnCount = 0;
@@ -26,11 +22,12 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     private Coroutine _currentSpawnCoroutine;   // 현재 실행 중인 SpawnEnemies 코루틴
     private int _enemySpawnId = 0;              //게임이 시작되는 생성되는 적의 고유 아이디
     private float _totalPlayTime = 0f;
-    private float _nextEliteMonsterTime = 0f;
-    private int _lastBossWaveTime = 0; // 마지막 보스 웨이브 시간 (분 단위)
     private bool _isBossWaveActive = false; // 보스 웨이브 진행 중 여부
 
-    private int[] _bossWaveTimeMinutes = new int[] { 2, 3};
+    private int _curEliteIndex = 0;
+    private int _curBossIndex = 0;
+    private float[] _eliteTimeSec = new float[] { 60, 120, 240, 300, 420, 480, 540 };
+    private float[] _bossTimeSec = new float[] { 180, 360, 600 };
 
     public List<InGameEnemy> Enemies => _enemies;
 
@@ -50,13 +47,17 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 
     public async Task Initialize()
     {
+        await Task.CompletedTask;
+    }
+
+    public void ReadyToStart()
+    {
         _currentWaveLevel = 1;
+        _curEliteIndex = 0;
+        _curBossIndex = 0;
         _enemySpawnId = 0;
         _totalPlayTime = 0f;
         _isBossWaveActive = false;
-        _nextEliteMonsterTime = ELITE_MONSTER_INTERVAL_INIT + Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
-
-        await Task.CompletedTask;
     }
 
     private void OnLevelChanged(int level)
@@ -69,7 +70,7 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     {
         _isBossWaveActive = false;
         //마지막 보스가 처리되면 게임 종료
-        if (_lastBossWaveTime == _bossWaveTimeMinutes.Last())
+        if (_curBossIndex == _bossTimeSec.Length)
         {
             InGameManager.Instance.GameOver();
         }
@@ -98,7 +99,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         if (!_isBossWaveActive)
         {
             _totalPlayTime += Time.deltaTime;
-            _nextEliteMonsterTime -= Time.deltaTime;
             //_totalPlayTime 1초 증가할 때마다 현재 게임 시간 호출
             if (Time.frameCount % 60 == 0)
             {
@@ -106,20 +106,19 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             }
         }
 
-        // 엘리트 몬스터 등장 체크 (보스 웨이브 중에는 스킵)
-        if (!_isBossWaveActive && _nextEliteMonsterTime <= 0f)
+        // 엘리트 몬스터 등장 체크
+        if (_curEliteIndex < _eliteTimeSec.Length && _eliteTimeSec[_curEliteIndex] <= _totalPlayTime)
         {
-            _nextEliteMonsterTime = Random.Range(ELITE_MONSTER_INTERVAL_MIN, ELITE_MONSTER_INTERVAL_MAX);
             SpawnEliteMonster();
+            _curEliteIndex++;
         }
 
         // 보스 웨이브 체크
-        int currentMinute = Mathf.FloorToInt(_totalPlayTime / 60f);
-        if (_bossWaveTimeMinutes.Contains(currentMinute) && currentMinute != _lastBossWaveTime)
+        if (_curBossIndex < _bossTimeSec.Length && _bossTimeSec[_curBossIndex] <= _totalPlayTime)
         {
-            _lastBossWaveTime = currentMinute;
             _isBossWaveActive = true;
             SpawnBossWave();
+            _curBossIndex++;
         }
     }
 
@@ -143,7 +142,6 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
             enemy.Stop();
         }
         _enemies.Clear();
-        _totalPlayTime = 0f;
 
         if (_currentSpawnCoroutine != null)
         {
@@ -173,16 +171,24 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
 
     private IEnumerator SpawnEnemyCoroutine(int enemyId)
     {
+        EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
+
+        // 적 배치 거리
         float distance = Constants.ENEMY_SPAWN_DISTANCE;
-        float randomAngleRadians = UnityEngine.Random.Range(0, 360) * Mathf.Deg2Rad;
+
+        //보스면 더 멀리 배치
+        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        {
+            distance = Constants.ENEMY_SPAWN_DISTANCE_BOSS;
+        }
+
+        float randomAngleRadians = Random.Range(0, 360) * Mathf.Deg2Rad;
         Vector3 spawnPosition = InGameManager.Instance.Planet.transform.position +
             new Vector3(Mathf.Cos(randomAngleRadians), Mathf.Sin(randomAngleRadians), 0) * distance;
 
         var enemyTask = AddressableManager.Instance.GetEnemy(enemyId, spawnPosition, transform);
         yield return new WaitUntil(() => enemyTask.IsCompleted);
         var enemy = enemyTask.Result;
-
-        EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
         enemy.Initialize(enemyData, _enemySpawnId);
         _enemies.Add(enemy);
         _enemySpawnId++;

@@ -58,8 +58,9 @@ public partial class InGameManager : GameObjectSingleton<InGameManager>
         if (_currentState == InGameState.GamePlay) return;
 
         ResetExp();
-        InGameRecordManager.Instance.ResetRecord();
-        InGameSkillManager.Instance.ResetSkills();
+        InGameRecordManager.Instance.ReadyToStart();
+        InGameSkillManager.Instance.ReadyToStart();
+        InGameWaveManager.Instance.ReadyToStart();
 
         // 행성 생성
         StartCoroutine(CreatePlanetAndStartGame());

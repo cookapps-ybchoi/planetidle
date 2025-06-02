@@ -20,6 +20,7 @@ public class Constants
     //게임 환경 변수
     public const float PLANET_BULLET_SPEED = 6f;
     public const float ENEMY_SPAWN_DISTANCE = 5f;
+    public const float ENEMY_SPAWN_DISTANCE_BOSS = 6f;
 
     //UI 변수
     public const float UI_FADE_TIME = 0.3f;
