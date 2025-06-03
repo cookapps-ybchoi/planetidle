@@ -49711,6 +49711,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81958475bc4997445b05393518f11e5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _enemies: {fileID: 11400000, guid: b5c615b5f86d27b45b9dad5b0a4acc7e, type: 2}
+  _waves: {fileID: 11400000, guid: ad96fd7b8fefb24438f33167b4a29302, type: 2}
 --- !u!114 &2119405039
 MonoBehaviour:
   m_ObjectHideFlags: 0

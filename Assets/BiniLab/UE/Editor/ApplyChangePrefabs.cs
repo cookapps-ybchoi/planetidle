@@ -10,12 +10,13 @@ public class ApplyChangePrefabs {
 	{
 		foreach (GameObject obj in Selection.gameObjects)
 		{
-			GameObject prefab_root = PrefabUtility.FindPrefabRoot(obj);
+			GameObject prefab_root = PrefabUtility.GetOutermostPrefabInstanceRoot(obj);
 			Object prefab_src = PrefabUtility.GetCorrespondingObjectFromSource(prefab_root);
 			if(prefab_src != null)
 			{
-				PrefabUtility.ReplacePrefab(prefab_root, prefab_src,  ReplacePrefabOptions.ConnectToPrefab);
-				Debug.Log("Updating prefab : "+AssetDatabase.GetAssetPath(prefab_src));
+				string prefabPath = AssetDatabase.GetAssetPath(prefab_src);
+				PrefabUtility.SaveAsPrefabAssetAndConnect(prefab_root, prefabPath, InteractionMode.AutomatedAction);
+				Debug.Log("Updating prefab : "+prefabPath);
 			}
 			else
 			{

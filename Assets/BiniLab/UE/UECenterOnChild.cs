@@ -119,7 +119,6 @@ public class UECenterOnChild : UIBehaviour, IEndDragHandler, IBeginDragHandler
 
     private int currentTarget = 0;
     private int lastTarget = 0;
-    private float dragStartPoint = 0f;
     private int itemCount; // how many items we have in our scroll rect
 
     private IEnumerator SnapRect(int target = -1)

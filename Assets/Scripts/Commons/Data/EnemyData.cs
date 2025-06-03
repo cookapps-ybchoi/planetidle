@@ -5,62 +5,36 @@ public enum EnemyType
     Boss
 }
 
-public class EnemyMetaData
-{
-    public int EnemyId { get; private set; }
-    public EnemyType EnemyType { get; private set; }
-    public double Hp { get; private set; }
-    public double HpIncRate { get; private set; }
-    public float MoveSpeed { get; private set; }
-    public float AttackRange { get; private set; }
-    public double AttackPower { get; private set; }
-    public float AttackDelay { get; private set; }
-    public int Point { get; private set; }
-
-    public EnemyMetaData(int enemyId, EnemyType enemyType, double hp, double hpIncRate, float moveSpeed, float attackRange, double attackPower, float attackDelay, int point)
-    {
-        EnemyId = enemyId;
-        EnemyType = enemyType;
-        Hp = hp;
-        HpIncRate = hpIncRate;
-        MoveSpeed = moveSpeed;
-        AttackRange = attackRange;
-        AttackPower = attackPower;
-        AttackDelay = attackDelay;
-        Point = point;
-    }
-}
-
 public class EnemyData
 {
-    public EnemyMetaData MetaData { get; private set; }
+    public EnemyEntity Entity { get; private set; }
     public int Level { get; private set; }
-    public double Hp { get; private set; }
-    public double MaxHp => MetaData.Hp * (1 + (Level - 1) * MetaData.HpIncRate);
-    public float MoveSpeed => MetaData.MoveSpeed;
-    public float AttackRange => MetaData.AttackRange;
-    public double AttackPower => MetaData.AttackPower;
-    public float AttackDelay => MetaData.AttackDelay;
-    public int Point => MetaData.Point;
+    public double CurHp { get; private set; }
+    public double MaxHp => Entity.hp * (1 + (Level - 1) * Entity.hpIncRate);
+    public float MoveSpeed => Entity.moveSpeed;
+    public float AttackRange => Entity.attackRange;
+    public double AttackPower => Entity.attackPower;
+    public float AttackDelay => Entity.attackDelay;
+    public int Point => Entity.point;
 
-    public EnemyData(EnemyMetaData metaData, int level)
+    public EnemyData(EnemyEntity metaData, int level)
     {
-        MetaData = metaData;
+        Entity = metaData;
         Level = level;
-        Hp = MaxHp;
+        CurHp = MaxHp;
     }
 
     public EnemyData Copy()
     {
-        return new EnemyData(MetaData, Level);
+        return new EnemyData(Entity, Level);
     }
 
     public void ChangeHp(double value)
     {
-        Hp += value;
-        if (Hp < 0)
+        CurHp += value;
+        if (CurHp < 0)
         {
-            Hp = 0;
+            CurHp = 0;
         }
     }
 

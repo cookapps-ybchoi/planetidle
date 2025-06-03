@@ -30,7 +30,8 @@ public class RESTfulApi
             // Request and wait for the desired page.
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error url : " + url + " error : " + webRequest.error + " code : " + webRequest.responseCode);
                 callback(false, webRequest.responseCode.ToString());
@@ -65,7 +66,8 @@ public class RESTfulApi
                 webRequest.SetRequestHeader("Authorization", "Bearer " + token);
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error: " + webRequest.error + " " + webRequest.responseCode + " " + webRequest.url);
                 if (callback != null)
@@ -102,7 +104,8 @@ public class RESTfulApi
                 webRequest.SetRequestHeader("Authorization", "Bearer " + token);
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error: " + webRequest.error + " " + webRequest.responseCode + " " + webRequest.url);
                 if (callback != null)
@@ -136,7 +139,8 @@ public class RESTfulApi
                 webRequest.SetRequestHeader("Authorization", "Bearer " + token);
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error: " + webRequest.error + " " + webRequest.responseCode);
                 if (callback != null)
@@ -169,7 +173,8 @@ public class RESTfulApi
                 webRequest.SetRequestHeader("Authorization", "Bearer " + token);
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.isNetworkError || webRequest.isHttpError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError("Error: " + webRequest.error + " " + webRequest.responseCode);
                 if (callback != null)

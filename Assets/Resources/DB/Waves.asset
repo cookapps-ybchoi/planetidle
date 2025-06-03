@@ -1,0 +1,186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23cade407ad09594691f464e37ed8e7d, type: 3}
+  m_Name: Waves
+  m_EditorClassIdentifier: 
+  Entities:
+  - id: 1
+    level: 1
+    spawnCount: 1
+    spawnInterval: 0.7
+    enemyIds: 01000000
+    spawnRates:
+    - 1
+  - id: 2
+    level: 2
+    spawnCount: 1
+    spawnInterval: 0.6
+    enemyIds: 0100000002000000
+    spawnRates:
+    - 0.8
+    - 2
+  - id: 3
+    level: 3
+    spawnCount: 1
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.7
+    - 2
+    - 0.1
+  - id: 4
+    level: 4
+    spawnCount: 1
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.7
+    - 2
+    - 0.1
+  - id: 5
+    level: 5
+    spawnCount: 1
+    spawnInterval: 0.5
+    enemyIds: 02000000
+    spawnRates:
+    - 1
+  - id: 6
+    level: 6
+    spawnCount: 2
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.6
+    - 3
+    - 0.1
+  - id: 7
+    level: 7
+    spawnCount: 2
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.55
+    - 0.3
+    - 0.15
+  - id: 8
+    level: 8
+    spawnCount: 2
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.55
+    - 0.3
+    - 0.15
+  - id: 9
+    level: 9
+    spawnCount: 2
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.5
+    - 0.3
+    - 0.2
+  - id: 10
+    level: 10
+    spawnCount: 2
+    spawnInterval: 0.4
+    enemyIds: 02000000
+    spawnRates:
+    - 1
+  - id: 11
+    level: 11
+    spawnCount: 3
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 12
+    level: 12
+    spawnCount: 3
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 13
+    level: 13
+    spawnCount: 3
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 14
+    level: 14
+    spawnCount: 3
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 15
+    level: 15
+    spawnCount: 3
+    spawnInterval: 0.4
+    enemyIds: 02000000
+    spawnRates:
+    - 1
+  - id: 16
+    level: 16
+    spawnCount: 4
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 17
+    level: 17
+    spawnCount: 4
+    spawnInterval: 0.6
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 18
+    level: 18
+    spawnCount: 4
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 19
+    level: 19
+    spawnCount: 4
+    spawnInterval: 0.5
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3
+  - id: 20
+    level: 20
+    spawnCount: 5
+    spawnInterval: 0.4
+    enemyIds: 010000000200000003000000
+    spawnRates:
+    - 0.4
+    - 0.3
+    - 0.3

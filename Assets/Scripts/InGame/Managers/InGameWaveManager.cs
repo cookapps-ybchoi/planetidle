@@ -80,14 +80,14 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     {
         if (!InGameManager.Instance.IsPlaying) return;
 
-        var waveDatas = DataManager.Instance.WaveDataList.Where(data => data.WaveLevel == _currentWaveLevel).ToList();
-        if (waveDatas != null && waveDatas.Any())
+        var waveEntity = DataManager.Instance.WaveDataList.Find(data => data.level == _currentWaveLevel);
+        if (waveEntity != null)
         {
             if (_currentSpawnCoroutine != null)
             {
                 StopCoroutine(_currentSpawnCoroutine);
             }
-            _currentSpawnCoroutine = StartCoroutine(SpawnEnemies(waveDatas));
+            _currentSpawnCoroutine = StartCoroutine(SpawnEnemies(waveEntity));
         }
     }
 
@@ -150,34 +150,31 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         }
     }
 
-    private IEnumerator SpawnEnemies(List<WaveMetaData> waveDatas)
+    private IEnumerator SpawnEnemies(WaveEntity waveEntity)
     {
-        float spawnInterval = waveDatas.First().SpawnInterval;
-
         while (true)
         {
-            WaveMetaData selectedWaveData = GetRandomWaveData(waveDatas);
-            int spawnCount = selectedWaveData.SpawnCount;
+            int randomEnemyId  = GetRandomEnemyId(waveEntity);
+            int spawnCount = waveEntity.spawnCount;
 
             for (int i = 0; i < spawnCount; i++)
             {
-                int randomEnemyId = selectedWaveData.SpawnId;
                 StartCoroutine(SpawnEnemyCoroutine(randomEnemyId));
                 _currentSpawnCount++;
             }
-            yield return new WaitForSeconds(spawnInterval);
+            yield return new WaitForSeconds(waveEntity.spawnInterval);
         }
     }
 
     private IEnumerator SpawnEnemyCoroutine(int enemyId)
     {
-        EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.EnemyId == enemyId), _currentWaveLevel);
+        EnemyData enemyData = new EnemyData(DataManager.Instance.EnemyDataList.Find(data => data.id == enemyId), _currentWaveLevel);
 
         // 적 배치 거리
         float distance = Constants.ENEMY_SPAWN_DISTANCE;
 
         //보스면 더 멀리 배치
-        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (enemyData.Entity.type == EnemyType.Boss)
         {
             distance = Constants.ENEMY_SPAWN_DISTANCE_BOSS;
         }
@@ -193,28 +190,28 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
         _enemies.Add(enemy);
         _enemySpawnId++;
 
-        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (enemyData.Entity.type == EnemyType.Boss)
         {
             InGameEventHandler.InvokeBossWaveStarted(enemyData);
         }
     }
 
-    private WaveMetaData GetRandomWaveData(List<WaveMetaData> waveDatas)
+    private int GetRandomEnemyId(WaveEntity waveEntity)
     {
-        float totalRate = waveDatas.Sum(data => data.SpawnRate);
-        float randomValue = UnityEngine.Random.Range(0f, totalRate);
+        float totalRate = waveEntity.spawnRates.Sum();
+        float randomValue = Random.Range(0f, totalRate);
         float currentSum = 0f;
 
-        foreach (var waveData in waveDatas)
+        for (int i = 0; i < waveEntity.spawnRates.Length; i++)
         {
-            currentSum += waveData.SpawnRate;
+            currentSum += waveEntity.spawnRates[i];
             if (randomValue <= currentSum)
             {
-                return waveData;
+                return waveEntity.enemyIds[i];
             }
         }
 
-        return null;
+        return 0;
     }
 
     public void RemoveEnemy(InGameEnemy enemy)
@@ -226,9 +223,9 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     {
         // 엘리트 몬스터 ID는 일반 몬스터 ID보다 큰 값으로 설정
         int eliteMonsterId = DataManager.Instance.EnemyDataList
-            .Where(data => data.EnemyType == EnemyType.Elite)
+            .Where(data => data.type == EnemyType.Elite)
             .OrderBy(x => Random.value)
-            .FirstOrDefault()?.EnemyId ?? 0;
+            .FirstOrDefault()?.id ?? 0;
 
         if (eliteMonsterId > 0)
         {
@@ -240,9 +237,9 @@ public class InGameWaveManager : GameObjectSingleton<InGameWaveManager>
     private void SpawnBossWave()
     {
         int bossMonsterId = DataManager.Instance.EnemyDataList
-            .Where(data => data.EnemyType == EnemyType.Boss)
+            .Where(data => data.type == EnemyType.Boss)
             .OrderBy(x => Random.value)
-            .FirstOrDefault()?.EnemyId ?? 0;
+            .FirstOrDefault()?.id ?? 0;
 
         if (bossMonsterId > 0)
         {

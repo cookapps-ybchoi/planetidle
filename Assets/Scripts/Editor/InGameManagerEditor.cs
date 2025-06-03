@@ -4,10 +4,6 @@ using UnityEditor;
 [CustomEditor(typeof(InGameManager))]
 public class InGameManagerEditor : Editor
 {
-    private readonly Color buttonColor = new Color(0.2f, 0.6f, 1f);
-    private readonly Color disabledButtonColor = new Color(0.5f, 0.5f, 0.5f);
-    private readonly int maxLevel = 100; // 최대 레벨 설정
-
     private void OnEnable()
     {
         // 에디터가 활성화될 때 이벤트 구독

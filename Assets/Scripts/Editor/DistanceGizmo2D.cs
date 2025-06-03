@@ -6,8 +6,6 @@ public class DistanceGizmo2D : MonoBehaviour
 {
     [SerializeField] private int maxDistance = 5; // 최대 거리 (0.5 단위로 곱해짐)
     [SerializeField] private Color gizmoColor = new Color(1f, 1f, 1f, 0.3f); // 기본 색상
-    [SerializeField] private int segments = 32; // 원의 세그먼트 수
-    [SerializeField] private float textSize = 0.2f; // 텍스트 크기
     [SerializeField] private Color textColor = Color.white; // 텍스트 색상
 
     private void OnDrawGizmos()

@@ -278,7 +278,7 @@ namespace ClockStone
 
         private AudioController _FindAudioController()
         {
-            _audioControllerList = FindObjectsOfType( typeof( AudioController ) ) as AudioController[ ];
+            _audioControllerList = FindObjectsByType<AudioController>(FindObjectsSortMode.None);
             if ( _audioControllerList != null && _audioControllerList.Length > 0 )
             {
                 _audioControllerNameList = new string[ _audioControllerList.Length ];

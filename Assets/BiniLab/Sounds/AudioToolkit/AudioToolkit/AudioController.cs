@@ -1600,7 +1600,7 @@ public class AudioController : SingletonMonoBehaviour<AudioController>, ISeriali
 
         if ( MyInstance._currentAudioListener == null )
         {
-            MyInstance._currentAudioListener = (AudioListener) FindObjectOfType( typeof( AudioListener ) );
+            MyInstance._currentAudioListener = (AudioListener)FindFirstObjectByType(typeof(AudioListener));
         }
 
         return MyInstance._currentAudioListener;

@@ -42,7 +42,7 @@ namespace ClockStone
                 T component = null;
                 if ( searchInObjectHierarchy )
                 {
-                    var components = GameObject.FindObjectsOfType<T>();
+                    T[] components = GameObject.FindObjectsByType<T>(FindObjectsSortMode.None);
                     for ( int i = 0; i < components.Length; i++ )
                     {
                         var sb = components[ i ] as ISingletonMonoBehaviour;
@@ -60,7 +60,7 @@ namespace ClockStone
                         GameObject go = (GameObject) GameObject.Instantiate( _autoCreatePrefab );
                         go.name = _autoCreatePrefab.name; // removes "(clone)"
 
-                        var newComponent = GameObject.FindObjectOfType<T>();
+                        T newComponent = GameObject.FindFirstObjectByType<T>();
 
                         if ( !newComponent )
                         {

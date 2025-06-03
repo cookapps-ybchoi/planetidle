@@ -41,7 +41,7 @@ public class UEPopup : UEComponent
 
     public static void HideAll()
     {
-        foreach (UEPopup pop in FindObjectsOfType<UEPopup>())
+        foreach (UEPopup pop in FindObjectsByType<UEPopup>(FindObjectsSortMode.None))
         {
             pop.Hide();
         }
@@ -49,7 +49,7 @@ public class UEPopup : UEComponent
 
     public static void HideAllForReset()
     {
-        foreach (UEPopup pop in FindObjectsOfType<UEPopup>())
+        foreach (UEPopup pop in FindObjectsByType<UEPopup>(FindObjectsSortMode.None))
         {
             if (pop.isDontDestroy == true)
                 continue;

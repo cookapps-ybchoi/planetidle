@@ -157,15 +157,15 @@ public class InGamePlayUI : BaseUI
 
     private void OnBossStateChanged(EnemyData enemyData)
     {
-        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (enemyData.Entity.type == EnemyType.Boss)
         {
-            _bossHpSlider.DOValue((float)enemyData.Hp / (float)enemyData.MaxHp, 0.2f).SetUpdate(true);
+            _bossHpSlider.DOValue((float)enemyData.CurHp / (float)enemyData.MaxHp, 0.2f).SetUpdate(true);
         }
     }
 
     private void OnBossWaveStarted(EnemyData enemyData)
     {
-        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (enemyData.Entity.type == EnemyType.Boss)
         {
             _bossHpSlider.gameObject.SetActive(true);
             _bossHpSlider.value = 0;
@@ -176,7 +176,7 @@ public class InGamePlayUI : BaseUI
 
     private void OnBossWaveCompleted(EnemyData enemyData)
     {
-        if (enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (enemyData.Entity.type == EnemyType.Boss)
         {
             _bossHpSlider.gameObject.SetActive(false);
             _levelSlider.gameObject.SetActive(true);

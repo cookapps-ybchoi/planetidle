@@ -65,7 +65,7 @@ public class InGameEnemy : PoolableObject
         EnemySpawnId = enemySpawnId;
         IsOnRange = false;
 
-        if (_enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (_enemyData.Entity.type == EnemyType.Boss)
         {
             InGameEventHandler.InvokeBossStateChanged(_enemyData);
         }
@@ -84,16 +84,16 @@ public class InGameEnemy : PoolableObject
 
         _enemyData.ChangeHp(-damage);
 
-        if (_enemyData.MetaData.EnemyType == EnemyType.Boss)
+        if (_enemyData.Entity.type == EnemyType.Boss)
         {
             InGameEventHandler.InvokeBossStateChanged(_enemyData);
         }
 
-        if (_enemyData.Hp <= 0)
+        if (_enemyData.CurHp <= 0)
         {
             CurrentState = EnemyState.Destroy;
 
-            if (_enemyData.MetaData.EnemyType == EnemyType.Boss)
+            if (_enemyData.Entity.type == EnemyType.Boss)
             {
                 InGameEventHandler.InvokeBossWaveCompleted(_enemyData);
             }
