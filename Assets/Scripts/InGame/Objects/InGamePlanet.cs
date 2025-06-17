@@ -127,7 +127,7 @@ public class InGamePlanet : PoolableObject
         DOTween.To(() => 0f, (float range) =>
         {
             DrawRange(range);
-        }, (float)PlanetData.Range, 1f).SetEase(Ease.OutBack).onComplete = () =>
+        }, (float)PlanetData.AttackRange, 1f).SetEase(Ease.OutBack).onComplete = () =>
         {
             _isReady = true;
             StartGameRoutine();
@@ -145,14 +145,14 @@ public class InGamePlanet : PoolableObject
         DOTween.To(() => 0f, (float range) =>
         {
             DrawRange(range);
-        }, (float)PlanetData.Range, 1f).SetEase(Ease.OutBack).onComplete = () =>
+        }, (float)PlanetData.AttackRange, 1f).SetEase(Ease.OutBack).onComplete = () =>
         {
             DOTween.To(() => originalColor, (Color color) =>
             {
                 _rangeSprite.material.SetColor("_Color", color);
             }, Color.green, 0.5f).SetEase(Ease.InOutQuad).SetLoops(4, LoopType.Yoyo).onComplete = () =>
             {
-                DrawRange(PlanetData.Range);
+                DrawRange(PlanetData.AttackRange);
             };
         };
     }
@@ -198,7 +198,7 @@ public class InGamePlanet : PoolableObject
     {
         if (_canAttack)
         {
-            UpdateTargetsOnRange(transform.position, PlanetData.Range);
+            UpdateTargetsOnRange(transform.position, PlanetData.AttackRange);
             StartCoroutine(AttackTargetsOnRange());
         }
     }
@@ -230,7 +230,7 @@ public class InGamePlanet : PoolableObject
                 _canAttack = false;
                 float attackCooltime = (float)PlanetData.AttackCooltime / (float)PlanetData.AttackSpeed;
 
-                int attackCount = Math.Min((int)PlanetData.ShotCount, enemies.Count);
+                int attackCount = Math.Min((int)PlanetData.AttackCount, enemies.Count);
 
                 // 공격 대상이 여러 개일 경우 가장 가까운 대상부터 공격
                 // 공격 대상이 공격 가능 갯수 보다 많을 경우에만 거리순으로 소트

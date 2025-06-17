@@ -15,61 +15,35 @@ public enum PlanetStatType
 
 }
 
-public class PlanetMetaData
-{
-    public int PlanetId { get; private set; }
-    public int PlanetLevel { get; private set; }
-    public double AttackPower { get; private set; }
-    public double AttackCooltime { get; private set; }
-    public double AttackSpeed { get; private set; }
-    public double Range { get; private set; }
-    public double Hp { get; private set; }
-    public double HpRecovery { get; private set; }
-    public double ShotCount { get; private set; }
-
-    public PlanetMetaData(int planetId, int planetLevel, double attackPower, double attackCooltime,
-    double attackSpeed, double range, double hp, double hpRecovery, double shotCount)
-    {
-        PlanetId = planetId;
-        PlanetLevel = planetLevel;
-        AttackPower = attackPower;
-        AttackCooltime = attackCooltime;
-        AttackSpeed = attackSpeed;
-        Range = range;
-        Hp = hp;
-        HpRecovery = hpRecovery;
-        ShotCount = shotCount;
-    }
-}
-
 [Serializable]
 public class PlanetData
 {
-    public PlanetMetaData MetaData { get; private set; }
+    public PlanetEntity Entity { get; private set; }
 
-    public int PlanetId { get => MetaData.PlanetId; }
+    public int PlanetId { get => Entity.planetId; }
+    public int PlanetLevel { get => Entity.planetLevel; }
 
     public double MaxHp { get; set; }
     public double Hp { get; set; }
     public double HpRecovery { get; set; }
-    public double Range { get; set; }
+    public double AttackRange { get; set; }
     public double AttackPower { get; set; }
     public double AttackSpeed { get; set; }
     public double AttackCooltime { get; set; }
-    public double ShotCount { get; set; }
+    public double AttackCount { get; set; }
 
-    public PlanetData(PlanetMetaData metaData)
+    public PlanetData(PlanetEntity entity)
     {
-        MetaData = metaData;
+        Entity = entity;
 
-        MaxHp = MetaData.Hp;
-        Hp = MetaData.Hp;
-        HpRecovery = MetaData.HpRecovery;
-        Range = MetaData.Range;
-        AttackPower = MetaData.AttackPower;
-        AttackSpeed = MetaData.AttackSpeed;
-        AttackCooltime = MetaData.AttackCooltime;
-        ShotCount = MetaData.ShotCount;
+        MaxHp = Entity.hp;
+        Hp = Entity.hp;
+        HpRecovery = Entity.hpRecovery;
+        AttackRange = Entity.attackRange;
+        AttackPower = Entity.attackPower;
+        AttackSpeed = Entity.attackSpeed;
+        AttackCooltime = Entity.attackCooltime;
+        AttackCount = Entity.attackCount;
     }
 
     public double GetStateValue(PlanetStatType statType)
@@ -79,11 +53,11 @@ public class PlanetData
             PlanetStatType.Hp => Hp,
             PlanetStatType.MaxHp => MaxHp,
             PlanetStatType.HpRecovery => HpRecovery,
-            PlanetStatType.Range => Range,
+            PlanetStatType.Range => AttackRange,
             PlanetStatType.AttackPower => AttackPower,
             PlanetStatType.AttackSpeed => AttackSpeed,
             PlanetStatType.AttackCooltime => AttackCooltime,
-            PlanetStatType.ShotCount => ShotCount,
+            PlanetStatType.ShotCount => AttackCount,
             _ => 0f
         };
     }
@@ -105,7 +79,7 @@ public class PlanetData
                 HpRecovery = value;
                 break;
             case PlanetStatType.Range:
-                Range = value;
+                AttackRange = value;
                 break;
             case PlanetStatType.AttackPower:
                 AttackPower = value;
@@ -117,7 +91,7 @@ public class PlanetData
                 AttackCooltime = value;
                 break;
             case PlanetStatType.ShotCount:
-                ShotCount = value;
+                AttackCount = value;
                 break;
         }
 

@@ -9,11 +9,13 @@ public class DataManager : GameObjectSingleton<DataManager>
 
     [SerializeField] private Enemies _enemies;
     [SerializeField] private Waves _waves;
+    [SerializeField] private Planets _planets;
 
     private List<InGameSkillMetaData> _inGameSkillDatas;
 
     public List<EnemyEntity> EnemyDataList => _enemies.Entities;
     public List<WaveEntity> WaveDataList => _waves.Entities;
+    public List<PlanetEntity> PlanetDataList => _planets.Entities;
     public List<InGameSkillMetaData> InGameSkillDataList => _inGameSkillDatas;
 
     public Task Initialize()
@@ -45,14 +47,7 @@ public class DataManager : GameObjectSingleton<DataManager>
 
     public PlanetData CreatePlanetData()
     {
-        return new PlanetData(new PlanetMetaData(planetId: 1, planetLevel: 1,
-        attackPower: Constants.PLANET_ATTACK_POWER_DEFUALT,
-        attackCooltime: Constants.PLANET_ATTACK_COOLTIME_DEFUALT,
-        range: Constants.PLANET_RANGE_DEFUALT,
-        attackSpeed: Constants.PLANET_ATTACK_SPEED_DEFUALT,
-        hp: Constants.PLANET_HP_DEFAULT,
-        hpRecovery: Constants.PLANET_HP_RECOVERY_DEFAULT,
-        shotCount: Constants.PLANET_SHOT_COUNT_DEFAULT));
+        return new PlanetData(PlanetDataList.Find(x => x.planetId == 1 && x.planetLevel == 1));
     }
 
     private async Task SavePlanetDataAsync(PlanetData planetData)
